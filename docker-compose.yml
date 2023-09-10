@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  ruby: 
+    image: ruby
+    environment:
+      - RUBY_YJIT_ENABLE=1
+    working_dir: /app
+    volumes:
+      - .:/app
+      - rubygems:/usr/local/bundle
+volumes:
+  rubygems:
