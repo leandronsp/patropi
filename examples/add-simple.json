@@ -1,0 +1,43 @@
+{
+  "name": "examples/add-simple.rinha",
+  "expression": {
+    "kind": "Print",
+    "value": {
+      "kind": "Binary",
+      "lhs": {
+        "kind": "Int",
+        "value": 1,
+        "location": {
+          "start": 6,
+          "end": 7,
+          "filename": "examples/add-simple.rinha"
+        }
+      },
+      "op": "Add",
+      "rhs": {
+        "kind": "Int",
+        "value": 2,
+        "location": {
+          "start": 10,
+          "end": 11,
+          "filename": "examples/add-simple.rinha"
+        }
+      },
+      "location": {
+        "start": 6,
+        "end": 11,
+        "filename": "examples/add-simple.rinha"
+      }
+    },
+    "location": {
+      "start": 0,
+      "end": 12,
+      "filename": "examples/add-simple.rinha"
+    }
+  },
+  "location": {
+    "start": 0,
+    "end": 12,
+    "filename": "examples/add-simple.rinha"
+  }
+}
