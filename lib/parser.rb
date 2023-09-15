@@ -41,8 +41,14 @@ class Parser
   end
 
   def parse_string(node)
-    node.merge!({ kind: 'Str', value: @current_token[1] })
+    string_token = { kind: 'Str', value: @current_token[1] }
     consume(:STRING)
+
+    if @current_token[0] == :BINARY_OP
+      parse_binary_op(node, string_token)
+    else
+      node.merge!(string_token)
+    end
   end
 
   def parse_number(node)

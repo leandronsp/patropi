@@ -38,4 +38,19 @@ class LexerTest < Test::Unit::TestCase
       [:RPAREN, ')']
     ], lexer.tokenize)
   end
+
+  def test_print_mixed_types
+    lexer = Lexer.new('print("40 + 2 = " + 40 + 2)')
+
+    assert_equal([
+      [:PRINT, 'print'],
+      [:LPAREN, '('],
+      [:STRING, '40 + 2 = '],
+      [:BINARY_OP, '+'],
+      [:NUMBER, '40'],
+      [:BINARY_OP, '+'],
+      [:NUMBER, '2'],
+      [:RPAREN, ')']
+    ], lexer.tokenize)
+  end
 end
