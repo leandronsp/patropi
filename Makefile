@@ -17,3 +17,6 @@ rinha.run: ## Run interpreter from STDIN
 
 rinha.hello: ## Run a sample hello world
 	@rinha examples/hello.rinha | jq | tee examples/hello.json | make rinha.run
+
+rinha.test: ## Run tests
+	@docker compose run --rm --no-TTY ruby ruby -Itest test/all.rb

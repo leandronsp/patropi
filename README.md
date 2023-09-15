@@ -33,6 +33,7 @@ Usage: make <target>
   rinha.setup                Setup
   rinha.run                  Run interpreter from STDIN
   rinha.hello                Run a sample hello world
+  rinha.test                 Run tests
 ```
 
 ## Generating the AST's
@@ -45,6 +46,16 @@ $ cargo install rinha
 ```
 
 Now, generating AST is as simples as `rinha source.fib`. There are a bunch of generated AST's in the `examples` folder.
+
+## Experimental
+
+Patropi comes with a simple lexer and parser that tries to implement the rinha languag specification. In order to run the unit tests:
+
+```bash
+$ make rinha.test
+```
+
+_The lexer and parser are still in experimental phase._
 
 ----
 
