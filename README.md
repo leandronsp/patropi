@@ -49,7 +49,7 @@ Now, generating AST is as simples as `rinha source.fib`. There are a bunch of ge
 
 ## Experimental
 
-Patropi comes with a simple lexer and parser that tries to implement the rinha languag specification. In order to run the unit tests:
+Patropi comes with a simple lexer and parser that tries to implement the rinha language specification. In order to run the unit tests:
 
 ```bash
 $ make rinha.test
