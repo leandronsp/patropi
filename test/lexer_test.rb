@@ -21,7 +21,20 @@ class LexerTest < Test::Unit::TestCase
     assert_equal([
       [:PRINT, 'print'],
       [:LPAREN, '('],
-      [:INTEGER, 42],
+      [:NUMBER, '42'],
+      [:RPAREN, ')']
+    ], lexer.tokenize)
+  end
+
+  def test_print_sum
+    lexer = Lexer.new('print(40 + 2)')
+
+    assert_equal([
+      [:PRINT, 'print'],
+      [:LPAREN, '('],
+      [:NUMBER, '40'],
+      [:BINARY_OP, '+'],
+      [:NUMBER, '2'],
       [:RPAREN, ')']
     ], lexer.tokenize)
   end

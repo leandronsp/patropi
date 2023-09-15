@@ -5,9 +5,10 @@ class Lexer
     'print' => :PRINT
   }
 
-  TOKENS = {
+  SYMBOLS = {
     '(' => :LPAREN,
-    ')' => :RPAREN
+    ')' => :RPAREN,
+    '+' => :BINARY_OP
   }
 
   def initialize(str)
@@ -27,16 +28,44 @@ class Lexer
   def next_token
     return if @scanner.eos?
 
+    # Skip whitespace
+    @scanner.skip(/\s+/)
+
+    [
+      :tokenize_keyword,
+      :tokenize_symbol,
+      :tokenize_string,
+      :tokenize_integer
+    ].each do |method|
+      if token = send(method)
+        return token
+      end
+    end
+
+    raise "Unexpected token at: #{@scanner.peek(10)}"
+  end
+
+  def tokenize_keyword
     if token = @scanner.scan(/print/)
       [KEYWORDS[token], token]
-    elsif token = @scanner.scan(/[\(\)]/)
-      [TOKENS[token], token]
-    elsif token = @scanner.scan(/"(.*?)"/)
+    end
+  end
+
+  def tokenize_symbol
+    if token = @scanner.scan(/[\(\)\+]/)
+      [SYMBOLS[token], token]
+    end
+  end
+
+  def tokenize_string
+    if @scanner.scan(/"(.*?)"/)
       [:STRING, @scanner[1]]
-    elsif token = @scanner.scan(/\d+/)
-      [:INTEGER, token.to_i]
-    else 
-      raise "Unexpected token at: #{@scanner.peek(10)}"
+    end
+  end
+
+  def tokenize_integer
+    if token = @scanner.scan(/\d+/)
+      [:NUMBER, token]
     end
   end
 end
