@@ -12,6 +12,7 @@ class Interpreter
   def evaluate(term)
     case term
     in { kind: 'Print', value: value }; puts evaluate(value)
+    in { kind: 'Int', value: value }; value.to_i
     in { kind: 'Str', value: value }; value.to_s
     else 
       puts "Invalid term #{term}"

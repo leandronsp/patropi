@@ -1,30 +1,43 @@
+require 'byebug'
+
 class Parser
+  attr_reader :ast
+
   def initialize(lexer)
     @lexer = lexer
+
+    @ast = {}
     @current_token = nil
   end
 
-  def parse
-    ast = {}
+  def parse!
     advance!
 
-    if consume(:PRINT)
+    case @current_token
+    in [:PRINT, _]
+      node = @ast.merge!({ kind: 'Print', value: {} })
+
       consume(:LPAREN)
 
-      string_token = expect(:STRING)
-
-      ast.merge!({ 
-        kind: 'Print',
-        value: { 
+      case @current_token
+      in [:STRING, value]
+        node[:value].merge!({ 
           kind: 'Str',  
-          value: string_token[1]
-        }
-      }).tap { consume(:RPAREN) } 
+          value: value
+        })
+      in [:INTEGER, value]
+        node[:value].merge!({
+          kind: 'Int',
+          value: value
+        })
+      else 
+        raise "Unknown token inside PRINT #{@current_token}"
+      end
+
+      consume(:RPAREN)
     else
       raise "Syntax error. Expected print statement but found #{@current_token[0]}"
     end
-
-    ast
   end
 
   def advance! 
@@ -32,16 +45,11 @@ class Parser
   end
 
   def consume(token_type)
-    return false unless @current_token[0] == token_type
+    advance!
+
+    raise "Expected #{token_type} but found nil" unless @current_token
+    raise "Expected #{token_type} but found #{@current_token[0]}" unless @current_token[0] == token_type
 
     advance!
-    true
-  end
-
-  def expect(token_type)
-    @current_token.tap do |token|
-      raise "Syntax error. Expected #{token_type} but found #{@current_token[0]}" if token[0] != token_type
-      advance!
-    end
   end
 end

@@ -33,6 +33,8 @@ class Lexer
       [TOKENS[token], token]
     elsif token = @scanner.scan(/"(.*?)"/)
       [:STRING, @scanner[1]]
+    elsif token = @scanner.scan(/\d+/)
+      [:INTEGER, token.to_i]
     else 
       raise "Unexpected token at: #{@scanner.peek(10)}"
     end

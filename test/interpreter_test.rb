@@ -23,10 +23,21 @@ class InterpreterTest < Test::Unit::TestCase
     lexer = Lexer.new('print("Hello")')
     parser = Parser.new(lexer)
 
-    ast = parser.parse
+    parser.parse!
 
     assert_printed_to_stdout("Hello\n") do 
-      Interpreter.run({ expression: ast }.to_json)
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
+
+  def test_print_integer
+    lexer = Lexer.new('print(42)')
+    parser = Parser.new(lexer)
+
+    parser.parse!
+
+    assert_printed_to_stdout("42\n") do 
+      Interpreter.run({ expression: parser.ast }.to_json)
     end
   end
 end
