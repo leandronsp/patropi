@@ -2,13 +2,18 @@ require 'strscan'
 
 class Lexer
   KEYWORDS = {
-    'print' => :PRINT
+    'print' => :PRINT,
+    'let' => :LET
   }
 
   SYMBOLS = {
     '(' => :LPAREN,
     ')' => :RPAREN,
-    '+' => :BINARY_OP
+    '+' => :BINARY_OP,
+    '-' => :BINARY_OP,
+    '==' => :BINARY_OP,
+    '=' => :ASSIGNMENT,
+    ';' => :SEMICOLON
   }
 
   def initialize(str)
@@ -19,23 +24,25 @@ class Lexer
     tokens = []
 
     until @scanner.eos?
-      tokens << next_token
+      token = next_token
+      tokens << token if token
     end
 
     tokens
   end
 
   def next_token
-    return if @scanner.eos?
+    @scanner.skip(/\s+/) 
+    @scanner.skip(/\n/)
 
-    # Skip whitespace
-    @scanner.skip(/\s+/)
+    return if @scanner.eos?
 
     [
       :tokenize_keyword,
       :tokenize_symbol,
+      :tokenize_identifier,
       :tokenize_string,
-      :tokenize_integer
+      :tokenize_number
     ].each do |method|
       if token = send(method)
         return token
@@ -46,15 +53,21 @@ class Lexer
   end
 
   def tokenize_keyword
-    if token = @scanner.scan(/print/)
+    if token = @scanner.scan(/print|let/)
       [KEYWORDS[token], token]
     end
   end
 
   def tokenize_symbol
-    if token = @scanner.scan(/[\(\)\+]/)
+    if token = @scanner.scan(/[\(\)\+\-\;]|\=\=?/)
       [SYMBOLS[token], token]
     end
+  end
+
+  def tokenize_identifier
+    if token = @scanner.scan(/_|[a-zA-Z_][a-zA-Z0-9_]*/)
+      [:IDENTIFIER, token]
+    end 
   end
 
   def tokenize_string
@@ -63,7 +76,7 @@ class Lexer
     end
   end
 
-  def tokenize_integer
+  def tokenize_number
     if token = @scanner.scan(/\d+/)
       [:NUMBER, token]
     end

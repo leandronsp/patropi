@@ -53,4 +53,33 @@ class LexerTest < Test::Unit::TestCase
       [:RPAREN, ')']
     ], lexer.tokenize)
   end
+
+  def test_print_sum_of_two_variables 
+    program = <<~PROGRAM
+      let a = 40;
+      let b = 2;
+      print(a + b)
+    PROGRAM
+
+    lexer = Lexer.new(program)
+
+    assert_equal([
+      [:LET, 'let'],
+      [:IDENTIFIER, 'a'],
+      [:ASSIGNMENT, '='],
+      [:NUMBER, '40'],
+      [:SEMICOLON, ';'],
+      [:LET, 'let'],
+      [:IDENTIFIER, 'b'],
+      [:ASSIGNMENT, '='],
+      [:NUMBER, '2'],
+      [:SEMICOLON, ';'],
+      [:PRINT, 'print'],
+      [:LPAREN, '('],
+      [:IDENTIFIER, 'a'],
+      [:BINARY_OP, '+'],
+      [:IDENTIFIER, 'b'],
+      [:RPAREN, ')']
+    ], lexer.tokenize)
+  end
 end

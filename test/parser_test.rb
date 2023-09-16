@@ -61,4 +61,38 @@ class ParserTest < Test::Unit::TestCase
       }
     }, parser.ast)
   end
+
+  def test_print_sum_of_two_variables 
+    program = <<~PROGRAM
+      let a = 40;
+      let b = 2;
+      print(a + b)
+    PROGRAM
+
+    lexer = Lexer.new(program)
+
+    parser = Parser.new(lexer)
+
+    parser.parse!
+
+    assert_equal({ 
+      kind: 'Let', 
+      name: { text: 'a' },
+      value: { kind: 'Int', value: 40 },
+      next: {
+        kind: 'Let', 
+        name: { text: 'b' },
+        value: { kind: 'Int', value: 2 },
+        next: { 
+          kind: 'Print', 
+          value: { 
+            kind: 'BinaryOp',
+            op: 'Add',
+            lhs: { kind: 'Var', text: 'a' },
+            rhs: { kind: 'Var', text: 'b' }
+          }
+        }
+      }
+    }, parser.ast)
+  end
 end
