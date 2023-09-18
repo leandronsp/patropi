@@ -95,4 +95,120 @@ class InterpreterTest < Test::Unit::TestCase
       Interpreter.run({ expression: parser.ast }.to_json)
     end
   end
+
+  def test_print_sum_of_two_variables
+    program = <<~PROGRAM
+      let a = 40;
+      let b = 2;
+      print(a + b)
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
+
+    assert_printed_to_stdout("42\n") do
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
+
+  def test_print_if
+    program = <<~PROGRAM
+      print(if (true) {
+        "verdadeiro"
+      } else {
+        "falso"
+      })
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
+
+    assert_printed_to_stdout("verdadeiro\n") do
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
+
+  def test_print_function
+    program = <<~PROGRAM
+      let add = fn(a, b) => { 
+        a + b
+      };
+      print(add(40, 2))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
+
+    assert_printed_to_stdout("42\n") do 
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
+
+  def test_recursive_sum 
+    program = <<~PROGRAM
+      let sum = fn(n, acc) => { 
+        if (n == 0) {
+          acc
+        } else {
+          sum(n - 1, acc + n)
+        }
+      };
+      print(sum(10, 0))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
+
+    assert_printed_to_stdout("55\n") do 
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
+  
+  #def test_fibonacci_function
+  #  program = <<~PROGRAM
+  #    let fib = fn (n) => {
+  #      if (n < 2) {
+  #        n
+  #      } else {
+  #        fib(n - 1) + fib(n - 2)
+  #      }
+  #    };
+
+  #    print("fib: " + fib(10))
+  #  PROGRAM
+
+  #  lexer = Lexer.new(program)
+  #  parser = Parser.new(lexer)
+  #  parser.parse!
+
+  #  assert_printed_to_stdout("fib: 55\n") do
+  #    Interpreter.run({ expression: parser.ast }.to_json)
+  #  end
+  #end
+
+  def test_fibonacci_function_tail_recursion
+    program = <<~PROGRAM
+      let fib = fn (n, a, b) => {
+        if (n == 0) {
+          a
+        } else {
+          fib(n - 1, b, a + b)
+        }
+      };
+
+      print("fib: " + fib(10, 0, 1))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
+
+    assert_printed_to_stdout("fib: 55\n") do
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
 end

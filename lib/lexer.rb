@@ -3,7 +3,12 @@ require 'strscan'
 class Lexer
   KEYWORDS = {
     'print' => :PRINT,
-    'let' => :LET
+    'let' => :LET,
+    'fn' => :FUNCTION,
+    'if' => :IF,
+    'else' => :ELSE,
+    'true' => :TRUE,
+    'false' => :FALSE
   }
 
   SYMBOLS = {
@@ -12,8 +17,13 @@ class Lexer
     '+' => :BINARY_OP,
     '-' => :BINARY_OP,
     '==' => :BINARY_OP,
+    '<' => :BINARY_OP,
     '=' => :ASSIGNMENT,
-    ';' => :SEMICOLON
+    ';' => :SEMICOLON,
+    '{' => :LBRACE,
+    '}' => :RBRACE,
+    ',' => :COMMA,
+    '=>' => :ARROW
   }
 
   def initialize(str)
@@ -53,13 +63,15 @@ class Lexer
   end
 
   def tokenize_keyword
-    if token = @scanner.scan(/print|let/)
+    if token = @scanner.scan(/print|let|fn|if|else|true|false/)
       [KEYWORDS[token], token]
     end
   end
 
   def tokenize_symbol
-    if token = @scanner.scan(/[\(\)\+\-\;]|\=\=?/)
+    # Allowed symbols
+    # ( ) + - ; { } , == => = <
+    if token = @scanner.scan(/[\(\)\+\-\;\{\}\,\<]|\=\=?\>?/)
       [SYMBOLS[token], token]
     end
   end

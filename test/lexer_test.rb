@@ -82,4 +82,171 @@ class LexerTest < Test::Unit::TestCase
       [:RPAREN, ')']
     ], lexer.tokenize)
   end
+
+  def test_print_if
+    program = <<~PROGRAM
+      print(if (true) {
+        "verdadeiro"
+      } else {
+        "falso"
+      })
+    PROGRAM
+
+    lexer = Lexer.new(program)
+
+    assert_equal([
+      [:PRINT, 'print'],
+      [:LPAREN, '('],
+      [:IF, 'if'],
+      [:LPAREN, '('],
+      [:TRUE, 'true'],
+      [:RPAREN, ')'],
+      [:LBRACE, '{'],
+      [:STRING, 'verdadeiro'],
+      [:RBRACE, '}'],
+      [:ELSE, 'else'],
+      [:LBRACE, '{'],
+      [:STRING, 'falso'],
+      [:RBRACE, '}'],
+      [:RPAREN, ')']
+    ], lexer.tokenize)
+  end
+
+  def test_print_let_if
+    program = <<~PROGRAM
+      let a = 42;
+      print(if (a == 42) {
+        "a is 42"
+      } else {
+        "a is NOT 42"
+      })
+    PROGRAM
+
+    lexer = Lexer.new(program)
+
+    assert_equal([
+      [:LET, 'let'],
+      [:IDENTIFIER, 'a'],
+      [:ASSIGNMENT, '='],
+      [:NUMBER, '42'],
+      [:SEMICOLON, ';'],
+      [:PRINT, 'print'],
+      [:LPAREN, '('],
+      [:IF, 'if'],
+      [:LPAREN, '('],
+      [:IDENTIFIER, 'a'],
+      [:BINARY_OP, '=='],
+      [:NUMBER, '42'],
+      [:RPAREN, ')'],
+      [:LBRACE, '{'],
+      [:STRING, 'a is 42'],
+      [:RBRACE, '}'],
+      [:ELSE, 'else'],
+      [:LBRACE, '{'],
+      [:STRING, 'a is NOT 42'],
+      [:RBRACE, '}'],
+      [:RPAREN, ')']
+    ], lexer.tokenize)
+  end
+
+  def test_print_function
+    program = <<~PROGRAM
+      let add = fn (a, b) => {
+        a + b
+      };
+      print(add(1, 2))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+
+    assert_equal([
+      [:LET, 'let'],
+      [:IDENTIFIER, 'add'],
+      [:ASSIGNMENT, '='],
+      [:FUNCTION, 'fn'],
+      [:LPAREN, '('],
+      [:IDENTIFIER, 'a'],
+      [:COMMA, ','],
+      [:IDENTIFIER, 'b'],
+      [:RPAREN, ')'],
+      [:ARROW, '=>'],
+      [:LBRACE, '{'],
+      [:IDENTIFIER, 'a'],
+      [:BINARY_OP, '+'],
+      [:IDENTIFIER, 'b'],
+      [:RBRACE, '}'],
+      [:SEMICOLON, ';'],
+      [:PRINT, 'print'],
+      [:LPAREN, '('],
+      [:IDENTIFIER, 'add'],
+      [:LPAREN, '('],
+      [:NUMBER, '1'],
+      [:COMMA, ','],
+      [:NUMBER, '2'],
+      [:RPAREN, ')'],
+      [:RPAREN, ')']
+    ], lexer.tokenize)
+  end
+
+  def test_print_recursive_sum
+    program = <<~PROGRAM
+      let sum = fn(n, acc) => { 
+        if (n == 0) {
+          acc
+        } else {
+          sum(n - 1, acc + n)
+        }
+      };
+      print(sum(10, 0))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+
+    assert_equal([
+      [:LET, 'let'],
+      [:IDENTIFIER, 'sum'], 
+      [:ASSIGNMENT, '='],
+      [:FUNCTION, 'fn'],
+      [:LPAREN, '('],
+      [:IDENTIFIER, 'n'],
+      [:COMMA, ','],
+      [:IDENTIFIER, 'acc'],
+      [:RPAREN, ')'],
+      [:ARROW, '=>'],
+      [:LBRACE, '{'],
+      [:IF, 'if'],
+      [:LPAREN, '('],
+      [:IDENTIFIER, 'n'],
+      [:BINARY_OP, '=='],
+      [:NUMBER, '0'],
+      [:RPAREN, ')'],
+      [:LBRACE, '{'],
+      [:IDENTIFIER, 'acc'],
+      [:RBRACE, '}'],
+      [:ELSE, 'else'],
+      [:LBRACE, '{'],
+      [:IDENTIFIER, 'sum'],
+      [:LPAREN, '('],
+      [:IDENTIFIER, 'n'],
+      [:BINARY_OP, '-'],
+      [:NUMBER, '1'],
+      [:COMMA, ','],
+      [:IDENTIFIER, 'acc'],
+      [:BINARY_OP, '+'],
+      [:IDENTIFIER, 'n'],
+      [:RPAREN, ')'],
+      [:RBRACE, '}'],
+      [:RBRACE, '}'],
+      [:SEMICOLON, ';'],
+      [:PRINT, 'print'],
+      [:LPAREN, '('],
+      [:IDENTIFIER, 'sum'],
+      [:LPAREN, '('],
+      [:NUMBER, '10'],
+      [:COMMA, ','],
+      [:NUMBER, '0'],
+      [:RPAREN, ')'],
+      [:RPAREN, ')']
+    ], lexer.tokenize)
+  end
 end
