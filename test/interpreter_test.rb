@@ -168,27 +168,27 @@ class InterpreterTest < Test::Unit::TestCase
     end
   end
   
-  #def test_fibonacci_function
-  #  program = <<~PROGRAM
-  #    let fib = fn (n) => {
-  #      if (n < 2) {
-  #        n
-  #      } else {
-  #        fib(n - 1) + fib(n - 2)
-  #      }
-  #    };
+  def test_fibonacci_function
+    program = <<~PROGRAM
+      let fib = fn (n) => {
+        if (n < 2) {
+          n
+        } else {
+          fib(n - 1) + fib(n - 2)
+        }
+      };
 
-  #    print("fib: " + fib(10))
-  #  PROGRAM
+      print("fib: " + fib(10))
+    PROGRAM
 
-  #  lexer = Lexer.new(program)
-  #  parser = Parser.new(lexer)
-  #  parser.parse!
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
 
-  #  assert_printed_to_stdout("fib: 55\n") do
-  #    Interpreter.run({ expression: parser.ast }.to_json)
-  #  end
-  #end
+    assert_printed_to_stdout("fib: 55\n") do
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
 
   def test_fibonacci_function_tail_recursion
     program = <<~PROGRAM
