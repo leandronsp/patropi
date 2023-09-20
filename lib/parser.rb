@@ -19,65 +19,79 @@ class Parser
     advance!
   end
 
-  def parse!(scope = nil)
-    scope ||= @ast
+  def parse!
+    @ast.merge!(parse_current_term)
+  end
 
-    case @current_token
-    in [:PRINT, _]
-      node = scope.merge!({ kind: 'Print', value: {} })
-
-      consume(:PRINT) 
-      consume(:LPAREN)
-
-      parse_print_statement(node[:value])
-      consume(:RPAREN) 
-    in [:LET, _]
-      node = scope.merge!({ kind: 'Let', value: {} })
-      consume(:LET)
-
-      # consume identifier
-      identifier = @current_token[1]
-      node.merge!({ name: { text: identifier } })
-      consume(:IDENTIFIER)
-      consume(:ASSIGNMENT)
-
-      # consume value
-      if @current_token[0] == :STRING
-        parse_string(node[:value])
-      elsif @current_token[0] == :NUMBER
-        parse_number(node[:value])
-      elsif @current_token[0] == :FUNCTION
-        parse_function(node[:value])
-      else
-        raise "Unknown token inside LET #{@current_token}"
-      end
-
-      consume(:SEMICOLON)
-
-      node.merge!({ next: {} })
-      parse!(node[:next])
-    else
-      raise "Syntax error. Expected print statement but found #{@current_token[0]}"
+  def parse_current_term
+    case @current_token 
+    in [:STRING, _]; maybe_binary_op { parse_string }
+    in [:NUMBER, _]; maybe_binary_op { parse_integer }
+    in [:IDENTIFIER, _]; maybe_binary_op { parse_identifier }
+    in [:TRUE, _]; parse_boolean
+    in [:FALSE, _]; parse_boolean
+    in [:PRINT, _]; parse_print
+    in [:LET, _]; parse_let
+    in [:IF, _]; parse_if_statement
+    in [:FUNCTION, _]; parse_function
     end
   end
 
-  def parse_print_statement(node = nil)
-    node ||= {}
+  def parse_print 
+    node = { kind: 'Print', value: {} }
+    consume(:PRINT)
+    consume(:LPAREN)
 
-    case @current_token
-    in [:STRING, _]; parse_string(node)
-    in [:NUMBER, _]; parse_number(node)
-    in [:IDENTIFIER, _]; parse_identifier(node)
-    in [:IF, _]; parse_if_statement(node)
-    else
-      raise "Unknown token inside PRINT #{@current_token}"
+    node[:value] = parse_current_term
+
+    consume(:RPAREN)
+    node
+  end
+
+  def parse_let 
+    node = { kind: 'Let', name: { text: nil }, value: {} }
+    consume(:LET)
+
+    node[:name][:text] = @current_token[1]
+    consume(:IDENTIFIER)
+    consume(:ASSIGNMENT)
+
+    node[:value] = parse_current_term
+    consume(:SEMICOLON)
+    node[:next] = parse_current_term
+
+    node
+  end
+
+  def parse_if_statement
+    node = { kind: 'If', condition: {}, then: {}, otherwise: {} }
+
+    consume(:IF)
+    consume(:LPAREN)
+
+    node[:condition] = parse_current_term
+
+    consume(:RPAREN)
+    consume(:LBRACE)
+
+    node[:then] = parse_current_term
+
+    consume(:RBRACE)
+
+    if @current_token[0] == :ELSE
+      consume(:ELSE)
+      consume(:LBRACE)
+
+      node[:otherwise] = parse_current_term
+
+      consume(:RBRACE)
     end
 
     node
   end
 
-  def parse_function(node)
-    node.merge!({ kind: 'Function', parameters: [] })
+  def parse_function
+    node = { kind: 'Function', parameters: [], value: {} }
 
     consume(:FUNCTION)
     consume(:LPAREN)
@@ -92,117 +106,73 @@ class Parser
     consume(:ARROW)
     consume(:LBRACE)
 
-    node.merge!({ value: {} })
-
-    # TODO: refactor to make dynamically
-    if @current_token[0] == :IDENTIFIER
-      identifier_token = { kind: 'Var', text: @current_token[1] } 
-      consume(:IDENTIFIER)
-      parse_binary_op(node[:value], identifier_token)
-    end
-
-    if @current_token[0] == :IF 
-      parse_if_statement(node[:value])
-    end
+    node[:value] = parse_current_term
 
     consume(:RBRACE)
+    node
   end
 
-  def parse_if_statement(node)
-    node.merge!({ kind: 'If', condition: {} })
-
-    consume(:IF)
-    consume(:LPAREN)
-
-    if @current_token[0] == :TRUE
-      node[:condition].merge!({ kind: 'Bool', value: true })
-      consume(:TRUE)
-    elsif @current_token[0] == :FALSE
-      node[:condition].merge!({ kind: 'Bool', value: false })
-      consume(:FALSE)
-    elsif @current_token[0] == :IDENTIFIER
-      parse_identifier(node[:condition])
-    end
-
-    consume(:RPAREN) 
-    consume(:LBRACE)
-
-    node.merge!({ then: {} })
-    parse_print_statement(node[:then])
-
-    consume(:RBRACE)
-
-    if @current_token[0] == :ELSE
-      consume(:ELSE)
-      consume(:LBRACE)
-
-      node.merge!({ otherwise: {} })
-      #byebug
-      parse_print_statement(node[:otherwise])
-
-      consume(:RBRACE)
-    end
-  end
-
-  def parse_function_call(node, identifier_token)
-    node.merge!({ kind: 'Call', callee: identifier_token, arguments: [] })
+  def parse_function_call(callee)
+    node = { kind: 'Call', callee: callee, arguments: [] }
 
     while @current_token[0] != :RPAREN
-      node[:arguments] << parse_print_statement
+      node[:arguments] << parse_current_term
       consume(:COMMA) if @current_token[0] == :COMMA
     end
+
+    node
   end
 
-  def parse_identifier(node)
-    identifier_token = { kind: 'Var', text: @current_token[1] }
+  def parse_identifier
+    node = { kind: 'Var', text: @current_token[1] }
     consume(:IDENTIFIER)
 
-    if @current_token[0] == :BINARY_OP
-      parse_binary_op(node, identifier_token)
-    elsif @current_token[0] == :LPAREN # function call
-      advance!
-      parse_function_call(node, identifier_token)
+    if @current_token[0] == :LPAREN # function call
+      consume(:LPAREN)
+      function_call_node = maybe_binary_op { parse_function_call(node) }
       consume(:RPAREN)
-      #byebug
-    else 
-      node.merge!(identifier_token)
+      return function_call_node
     end
+
+    node
   end
 
-  def parse_string(node)
-    string_token = { kind: 'Str', value: @current_token[1] }
+  def parse_string
+    node = { kind: 'Str', value: @current_token[1] }
     consume(:STRING)
 
-    if @current_token[0] == :BINARY_OP
-      parse_binary_op(node, string_token)
-    else
-      node.merge!(string_token)
-    end
+    node
   end
 
-  def parse_number(node)
-    integer_token = { kind: 'Int', value: @current_token[1].to_i }
+  def parse_integer
+    node = { kind: 'Int', value: @current_token[1].to_i }
     consume(:NUMBER)
 
-    if @current_token[0] == :BINARY_OP
-      parse_binary_op(node, integer_token)
-    else 
-      node.merge!(integer_token)
-    end
+    node
   end
 
-  def parse_binary_op(node, lhs_token)
-    node.merge!({ 
-      kind: 'BinaryOp', 
-      op: BINARY_OPERATIONS[@current_token[1]], 
-      lhs: lhs_token,
-      rhs: {} 
-    })
+  def parse_boolean
+    node = { kind: 'Bool', value: @current_token[1] == 'true' }
+    consume(@current_token[0].upcase.to_sym)
 
+    node
+  end
+
+  def maybe_binary_op
+    return unless block_given?
+
+    lhs = yield
+    return lhs unless @current_token[0] == :BINARY_OP
+
+    operation = BINARY_OPERATIONS[@current_token[1]]
     consume(:BINARY_OP)
-    parse_number(node[:rhs]) if @current_token[0] == :NUMBER
-    parse_string(node[:rhs]) if @current_token[0] == :STRING
-    parse_identifier(node[:rhs]) if @current_token[0] == :IDENTIFIER
+
+    { 
+      kind: 'BinaryOp', 
+      op: operation,
+      lhs: lhs,
+      rhs: parse_current_term
+    }
   end
 
   def advance! 
