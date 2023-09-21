@@ -7,7 +7,7 @@ class Parser
     '+' => 'Add',
     '-' => 'Sub',
     '==' => 'Eq',
-    '<' => 'Lt',
+    '<' => 'Lt'
   }
 
   def initialize(lexer)

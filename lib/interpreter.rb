@@ -14,6 +14,7 @@ class Interpreter
     parsed = JSON.parse(json_input, symbolize_names: true)
     @stack.push(parsed[:expression])
 
+    # Trampoline
     loop do 
       term = @stack.pop
       break if term.nil?
@@ -79,6 +80,25 @@ class Interpreter
       })
 
       @stack.push(condition)
+      [:noop, nil]
+    in { kind: 'Function', parameters: parameters, value: value }
+      @executors.pop.call(-> (*args) { 
+        params = parameters.map { |param| param[:text] }
+        fn_args = params.zip(args).to_h
+        @scope.merge!(fn_args)
+        @stack.push(value)
+        [:noop, nil]
+      })
+
+      [:noop, nil]
+    in { kind: 'Call', callee: callee, arguments: arguments }
+      args = arguments.map { |arg| evaluate(arg)[1] }
+
+      @executors.push(-> (function) {
+        function.call(*args)
+      })
+
+      @stack.push(callee)
       [:noop, nil]
     else raise "Unkonwn term: #{term}"
     end
