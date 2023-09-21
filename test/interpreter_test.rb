@@ -190,7 +190,7 @@ class InterpreterTest < Test::Unit::TestCase
     end
   end
 
-  def test_fibonacci_function_tail_recursion
+  def test_fibonacci_function_tc_10
     program = <<~PROGRAM
       let fib = fn (n, a, b) => {
         if (n == 0) {
@@ -210,5 +210,48 @@ class InterpreterTest < Test::Unit::TestCase
     assert_printed_to_stdout("fib: 55\n") do
       Interpreter.run({ expression: parser.ast }.to_json)
     end
+  end
+
+  def test_fibonacci_function_tc_1000
+    program = <<~PROGRAM
+      let fib = fn (n, a, b) => {
+        if (n == 0) {
+          a
+        } else {
+          fib(n - 1, b, a + b)
+        }
+      };
+
+      print("fib: " + fib(1000, 0, 1))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
+
+    assert_printed_to_stdout("fib: 43466557686937456435688527675040625802564660517371780402481729089536555417949051890403879840079255169295922593080322634775209689623239873322471161642996440906533187938298969649928516003704476137795166849228875\n") do
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
+
+  def test_fibonacci_function_tc_10_000
+    program = <<~PROGRAM
+      let fib = fn (n, a, b) => {
+        if (n == 0) {
+          a
+        } else {
+          fib(n - 1, b, a + b)
+        }
+      };
+
+      print("fib: " + fib(10000, 0, 1))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
+
+    # run without StackOverflowError
+    Interpreter.run({ expression: parser.ast }.to_json)
   end
 end

@@ -1,53 +1,86 @@
 require 'json'
+require 'pry-byebug'
 
 class Interpreter 
   def self.run(*args) = new.run(*args)
 
-  def run(json_input)
-    parsed = JSON.parse(json_input, symbolize_names: true)
-
-    evaluate(parsed[:expression])
+  def initialize
+    @stack = []
+    @executors = []
+    @scope = {}
   end
 
-  def evaluate(term, scope = {})
+  def run(json_input)
+    parsed = JSON.parse(json_input, symbolize_names: true)
+    @stack.push(parsed[:expression])
+
+    loop do 
+      term = @stack.pop
+      break if term.nil?
+      continuation, result = evaluate(term)
+
+      case [continuation, result]
+      in [:raw, result]
+        executor = @executors.pop
+        continuation, result = executor&.call(result)
+
+        next if continuation == :noop
+
+        while executor = @executors.pop
+          continuation, result = executor&.call(result)
+          break if continuation == :noop
+        end
+      in [:noop, nil]; next
+      else raise "Unkonwn result: #{[continuation, result]}"
+      end
+    end
+  end
+
+  def evaluate(term)
     case term
-    in { kind: 'Print', value: value }; puts evaluate(value, scope)
-    in { kind: 'Int', value: value }; value.to_i
-    in { kind: 'Str', value: value }; value.to_s
-    in { kind: 'Bool', value: value }; value
+    in { kind: 'Str', value: value }; [:raw, value.to_s]
+    in { kind: 'Int', value: value }; [:raw, value.to_i]
+    in { kind: 'Bool', value: value }; [:raw, value]
+    in { kind: 'Print', value: next_term }
+      @executors.push(-> (result) { puts result })
+      @stack.push(next_term)
+      [:noop, nil]
     in { kind: 'BinaryOp', op: op, lhs: lhs, rhs: rhs }
-      operation = { 'Add' => '+', 'Sub' => '-', 'Eq' => '==', 'Lt' => '<' }[op]
+      @executors.push(-> (left) { 
+        @executors.push(-> (left, right) { 
+          result = case [op, left, right]
+                   in ['Add', Integer, Integer]; left + right
+                   in ['Add', _, _]; "#{left}#{right}"
+                   in ['Sub', Integer, Integer]; left - right
+                   in ['Eq', Integer, Integer]; left == right
+                   else raise "Unkown operation #{[op, left, right]}"
+                   end
+          [:raw, result]
+        }.curry[left])
 
-      left = evaluate(lhs, scope)
-      right = evaluate(rhs, scope)
+        [:noop, nil]
+      })
 
-      case [left, right]
-      in [Integer, Integer]; left.send(operation.to_sym, right) 
-      else "#{left}#{right}"
-      end
-    in { kind: 'Var', text: text }; scope[text]
-    in { kind: 'Let', name: { text: text }, value: value, next: next_ }
-      scope[text] = evaluate(value, scope)
-      evaluate(next_, scope)
-    in { kind: 'Function', parameters: parameters, value: value }
-      ->(*args) do 
-        params = parameters.map { |param| param[:text] }
-        arguments = params.zip(args).to_h
+      @stack.push(rhs, lhs)
+      [:noop, nil]
+    in { kind: 'Let', name: { text: text }, value: value, next: next_term }
+      @executors.push(-> (result) { 
+        @scope[text] = result
+        [:noop, nil]
+      })
 
-        evaluate(value, scope.merge(arguments))
-      end
-    in { kind: 'Call', callee: callee, arguments: arguments }
-      args = arguments.map { |arg| evaluate(arg, scope) }
-      function = evaluate(callee, scope)
-      function.(*args)
-    in { kind: 'If', condition: condition, then: then_, otherwise: otherwise }
-      if evaluate(condition, scope)
-        evaluate(then_, scope)
-      else 
-        evaluate(otherwise, scope)
-      end
-    else 
-      puts "Invalid term #{term}"
+      @stack.push(next_term, value)
+      [:noop, nil]
+    in { kind: 'Var', text: text }; [:raw, @scope[text]]
+    in { kind: 'If', condition: condition, then: then_term, otherwise: otherwise_term }
+      @executors.push(-> (result) { 
+        @stack.push(result ? then_term : otherwise_term)  
+        [:noop, nil]
+      })
+
+      @stack.push(condition)
+      [:noop, nil]
+    else raise "Unkonwn term: #{term}"
     end
   end
 end
