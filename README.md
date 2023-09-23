@@ -1,5 +1,7 @@
 # patropi
 
+Yet another implementation for [rinha](https://github.com/aripiprazole/rinha-de-compiler/blob/main/SPECS.md).
+
 ```
                 /\ \__                       __    
  _____      __  \ \ ,_\  _ __   ___   _____ /\_\   
@@ -12,19 +14,28 @@
 
 ```
 
-Yet another Ruby interpreter for [Rinha de Compiladores](https://github.com/aripiprazole/rinha-de-compiler)
+As of 2023' September, Patropi is a [tree-walking interpreter](https://craftinginterpreters.com/a-tree-walk-interpreter.html) written entirely in Ruby 3.2 [+YJIT](https://shopify.engineering/ruby-yjit-is-production-ready).
 
 ## Requirements
 
 * [Docker](https://docs.docker.com/get-docker/)
-* [rinha](https://crates.io/crates/rinha)
-* Make (optional)
+* [Rinha crate](https://crates.io/crates/rinha) to generate the AST. Requires Rust installed.
 
-## Stack
+## TL;DR
 
-* Ruby 3.2 [+YJIT](https://shopify.engineering/ruby-yjit-is-production-ready)
+```bash
+$ docker build -t patropi .
+$ rinha examples/hello.rinha | docker run --rm -i patropi
 
-## Usage
+Hello, world
+```
+
+There are a bunch of other examples in the `./examples` folder.
+
+## Usage with Make (optional)
+
+This project leverages on the use of Makefile to organize commands. 
+However if you don't want to use Make, feel free to check out the commands located in the `./bin/` folder.
 
 ```bash
 $ make help
@@ -37,26 +48,80 @@ Usage: make <target>
   patropi.bench              Run benchmarks
 ```
 
-## Generating the AST's
+## Architecture
 
-This projects uses the [rinha crate](https://crates.io/crates/rinha) created by @aripiprazole and Algebraic Sofia. In order to use it, make sure you have Rust installed, then:
+As mentioned before, Patropi is currently a tree-walking interpreter written in Ruby, implemented for [rinha](https://github.com/aripiprazole/rinha-de-compiler/blob/main/SPECS.md).
 
+The evaluation phase is made using the [Trampoline](https://en.wikipedia.org/wiki/Trampoline_(computing)) technique along with [Continuation-passing style](https://en.wikipedia.org/wiki/Continuation-passing_style)(CPS), which aims to avoid deep recursion thus mitigating risks of [stack buffer overflow](https://en.wikipedia.org/wiki/Stack_buffer_overflow).
+
+_Note: the implementation is very simple and naive, mainly used for learning more about compilers_.
+
+## Examples
+
+Fibonacci with no tail call
 ```bash
-$ cargo init
-$ cargo install rinha
+cat > temp.rinha <<EOF
+let fib = fn (n) => {
+  if (n < 2) {
+    n
+  } else {
+    fib(n - 1) + fib(n - 2)
+  }
+};
+print("fib: " + fib(10))
+EOF
+
+rinha temp.rinha | docker run --rm -i patropi
 ```
 
-Now, generating AST is as simples as `rinha source.fib`. There are a bunch of generated AST's in the `examples` folder.
-
-## Experimental
-
-Patropi comes with a simple lexer and parser that tries to implement the rinha language specification. In order to run the unit tests:
-
+Fibonacci with tail call
 ```bash
-$ make rinha.test
+cat > temp.rinha <<EOF
+let fib = fn (n, a, b) => {
+  if (n == 0) {
+    a
+  } else {
+    fib(n - 1, b, a + b)
+  }
+};
+print("fib: " + fib(10, 0, 1))
+EOF
+
+rinha temp.rinha | docker run --rm -i patropi
 ```
 
-_The lexer and parser are still in experimental phase._
+O QA pediu pra rodar
+```bash
+cat > temp.rinha <<EOF
+let sum = fn (a, b) => { a + b };
+let other_sum = fn (n) => { sum(n, 2) };
+let tuple = (
+	print(other_sum(10)), 
+	(fn (a, b) => { a - b })(10, 2)
+);
+print(tuple)
+EOF
+
+rinha temp.rinha | docker run --rm -i patropi
+```
+
+## Parser (experimental)
+
+Ideally, Patropi should be a complete intrepreter implementing a built-in parser for the rinha specification. 
+
+At this moment, it comes with a simple lexer and parser that are still in experimental phase. Checkout the `./lib` for further details.
+
+The parser is composed by the following components:
+
+### Lexer
+
+The lexer scans the input looking for regular expressions and produces grammar tokens. It is implemented using the `StringScanner` built-in Ruby class.
+
+### Parser
+
+The parser looks at the next token according to the grammar in a recursive top-down manner, which makes it a [recursive descent parser](https://en.wikipedia.org/wiki/Recursive_descent_parser). It is implemented in pure Ruby with no additional gems.
+
+_All the unit tests in this project are already using the built-in Patropi parser. We're yet to implement the remaining language specs, such as Tuples and Location._
 
 ----
 
