@@ -1,3 +1,9 @@
-let _ = print("Hello");
-let _ = print(42);
-print(true)
+let _ = print(2 * 2);
+let _ = print(3 / 2);
+let _ = print(3 != 1 + 1);
+let _ = print(1 <= 2);
+let _ = print(1 >= 2);
+let _ = print(1 > 2);
+let _ = print(true && false);
+let _ = print(true || false);
+print(4 % 2)
