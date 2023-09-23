@@ -2,6 +2,8 @@
 
 Yet another implementation for [rinha](https://github.com/aripiprazole/rinha-de-compiler/blob/main/SPECS.md).
 
+![tests](https://github.com/leandronsp/patropi/actions/workflows/ruby.yml/badge.svg)
+
 ```
                 /\ \__                       __    
  _____      __  \ \ ,_\  _ __   ___   _____ /\_\   
