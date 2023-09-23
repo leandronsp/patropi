@@ -56,6 +56,8 @@ As mentioned before, Patropi is currently a tree-walking interpreter written in 
 
 The evaluation phase is made using the [Trampoline](https://en.wikipedia.org/wiki/Trampoline_(computing)) technique along with [Continuation-passing style](https://en.wikipedia.org/wiki/Continuation-passing_style)(CPS), which aims to avoid deep recursion thus mitigating risks of [stack buffer overflow](https://en.wikipedia.org/wiki/Stack_buffer_overflow).
 
+![patropi architecture](https://github.com/leandronsp/patropi/blob/main/screenshots/patropi.png)
+
 _Note: the implementation is very simple and naive, mainly used for learning more about compilers_.
 
 ## Examples
