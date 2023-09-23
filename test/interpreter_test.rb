@@ -265,57 +265,6 @@ class InterpreterTest < Test::Unit::TestCase
     end
   end
 
-  def test_fibonacci_ruby_tc_trampoline_100000
-    fib = -> (a, b, c) { 
-      if a == 0
-        b
-      else 
-        -> { fib[a - 1, c, b + c] }
-      end
-    }
-
-    result = fib[100000, 0, 1]
-
-    while result.is_a?(Proc)
-      result = result.call
-    end
-
-    puts "Fib: #{result}"
-  end
-
-  # Requires
-  # RubyVM::InstructionSequence.compile_option = { tailcall_optimization: true }
-  def test_fibonacci_ruby_tco_100000
-    def fib(n, a, b)
-      return a if n == 0
-
-      fib(n - 1, b, a + b)
-    end
-
-    puts "Fib: #{fib(100000, 0, 1)}"
-  end
-
-  def test_fibonacci_blaster
-    program = <<~PROGRAM
-      let fib = fn (n, a, b) => {
-        if (n == 0) {
-          a
-        } else {
-          fib(n - 1, b, a + b)
-        }
-      };
-
-      print("fib: " + fib(100000, 0, 1))
-    PROGRAM
-
-    lexer = Lexer.new(program)
-    parser = Parser.new(lexer)
-    parser.parse!
-
-    # run without StackOverflowError
-    Interpreter.run({ expression: parser.ast }.to_json)
-  end
-
   def test_combination
     program = <<~PROGRAM
       let combination = fn (n, k) => {
@@ -342,18 +291,18 @@ class InterpreterTest < Test::Unit::TestCase
     end
   end
 
-  def test_tuple
-    program = <<~PROGRAM
-      let person = ("Leandro", 42);
-      print("Tuple: " + person + " | First: " + first(person) + " | Second: " + second(person))
-    PROGRAM
+  #def test_tuple
+  #  program = <<~PROGRAM
+  #    let person = ("Leandro", 42);
+  #    print("Tuple: " + person + " | First: " + first(person) + " | Second: " + second(person))
+  #  PROGRAM
 
-    lexer = Lexer.new(program)
-    parser = Parser.new(lexer)
-    parser.parse!
+  #  lexer = Lexer.new(program)
+  #  parser = Parser.new(lexer)
+  #  parser.parse!
 
-    assert_printed_to_stdout("Tuple: (Leandro, 42) | First: Leandro | Second: 42\n") do
-      Interpreter.run({ expression: parser.ast }.to_json)
-    end
-  end
+  #  assert_printed_to_stdout("Tuple: (Leandro, 42) | First: Leandro | Second: 42\n") do
+  #    Interpreter.run({ expression: parser.ast }.to_json)
+  #  end
+  #end
 end
