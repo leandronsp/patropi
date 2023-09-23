@@ -5,18 +5,18 @@ class Interpreter
   def self.run(*args) = new.run(*args)
 
   def initialize
-    @stack = []
+    @terms = []
     @executors = []
   end
 
   def run(json_input)
     parsed = JSON.parse(json_input, symbolize_names: true)
-    @stack.push(parsed[:expression])
+    @terms.push(parsed[:expression])
     scope = {}
 
     # Trampoline
     loop do 
-      term = @stack.pop
+      term = @terms.pop
       break if term.nil?
       continuation, result, scope = evaluate(term, scope)
 
@@ -44,83 +44,104 @@ class Interpreter
     in { kind: 'Str', value: value }; [:raw, value.to_s, scope]
     in { kind: 'Int', value: value }; [:raw, value.to_i, scope]
     in { kind: 'Bool', value: value }; [:raw, value, scope]
-    in { kind: 'Print', value: next_term }
-      @executors.push(-> (result) { puts result })
-      @stack.push(next_term)
+    in { kind: 'Print', value: next_term }; evaluate_print(next_term, scope)
+    in { kind: 'Binary', op: op, lhs: lhs, rhs: rhs }; evaluate_binary(op, lhs, rhs, scope)
+    in { kind: 'Let', name: { text: text }, value: value, next: next_term }; evaluate_let(text, value, next_term, scope)
+    in { kind: 'Var', text: text }; [:raw, scope[text], scope]
+    in { kind: 'If', condition: condition, then: then_term, otherwise: otherwise_term }; evaluate_if(condition, then_term, otherwise_term, scope)
+    in { kind: 'Function', parameters: parameters, value: value }; evaluate_function(parameters, value, scope)
+    in { kind: 'Call', callee: callee, arguments: arguments }; evaluate_fn_call(callee, arguments, scope)
+    else raise "Unkonwn term: #{term}"
+    end
+  end
+
+  def evaluate_print(next_term, scope)
+    @executors.push(-> (result) { 
+      puts result 
+      [:raw, result]
+    })
+
+    @terms.push(next_term)
+    [:noop, nil, scope]
+  end
+
+  def evaluate_let(text, value, next_term, scope)
+    @executors.push(-> (result) { 
+      scope[text] = result
+      @terms.push(next_term)
       [:noop, nil, scope]
-    in { kind: 'BinaryOp', op: op, lhs: lhs, rhs: rhs }
-      @executors.push(-> (left) { 
-        @executors.push(-> (left, right) { 
-          result = case [op, left, right]
-                   in ['Add', Integer, Integer]; left + right
-                   in ['Add', _, _]; "#{left}#{right}"
-                   in ['Sub', Integer, Integer]; left - right
-                   in ['Eq', Integer, Integer]; left == right
-                   in ['Lt', Integer, Integer]; left < right
-                   else raise "Unkown operation #{[op, left, right]}"
-                   end
-          [:raw, result, scope]
-        }.curry[left])
+    })
 
-        [:noop, nil, scope]
-      })
+    @terms.push(value)
+    [:noop, nil, scope]
+  end
 
-      @stack.push(rhs, lhs)
+  def evaluate_if(condition, then_term, otherwise_term, scope)
+    @executors.push(-> (result) { 
+      result ? @terms.push(then_term) : @terms.push(otherwise_term)
       [:noop, nil, scope]
-    in { kind: 'Let', name: { text: text }, value: value, next: next_term }
-      @executors.push(-> (result) { 
-        scope[text] = result
-        [:noop, nil, scope]
-      })
+    })
 
-      @stack.push(next_term, value)
-      [:noop, nil, scope]
-    in { kind: 'Var', text: text }
-      [:raw, scope[text], scope]
-    in { kind: 'If', condition: condition, then: then_term, otherwise: otherwise_term }
-      @executors.push(-> (result) { 
-        @stack.push(result ? then_term : otherwise_term)  
-        [:noop, nil, scope]
-      })
+    @terms.push(condition)
+    [:noop, nil, scope]
+  end
 
-      @stack.push(condition)
-      [:noop, nil, scope]
-    in { kind: 'Function', parameters: parameters, value: value }
-      @executors.pop.call(-> (*args) { 
-        params = parameters.map { |param| param[:text] }
-        fn_args = params.zip(args).to_h
-        scope.merge!(fn_args)
-        @stack.push(value)
-        [:noop, nil, scope]
-      })
+  def evaluate_function(parameters, value, scope)
+    @executors.pop.call(-> (*args) { 
+      new_scope = scope.dup
 
-      [:noop, nil, scope]
-    in { kind: 'Call', callee: callee, arguments: arguments }
-      args = arguments.map do |arg|
-        case arg
-        in { kind: 'BinaryOp', op: op, lhs: lhs, rhs: rhs }
-          left = evaluate(lhs, scope)[1]
-          right = evaluate(rhs, scope)[1]
-
-          case [op, left, right]
-          in ['Add', Integer, Integer]; left + right
-          in ['Add', _, _]; "#{left}#{right}"
-          in ['Sub', Integer, Integer]; left - right
-          in ['Eq', Integer, Integer]; left == right
-          in ['Lt', Integer, Integer]; left < right
-          else raise "Unkown operation #{[op, left, right]}"
-          end
-        else evaluate(arg, scope)[1]
-        end
+      parameters.each_with_index do |parameter, index|
+        new_scope[parameter[:text]] = args[index]
       end
 
-      @executors.push(-> (function) {
-        function.call(*args)
-      })
+      @terms.push(value)
+      [:noop, nil, new_scope]
+    })
 
-      @stack.push(callee)
+    [:noop, nil, scope]
+  end
+
+  def evaluate_fn_call(callee, arguments, scope)
+    args = arguments.map do |arg|
+      case arg
+      in { kind: 'Binary', op: op, lhs: lhs, rhs: rhs }
+        left = evaluate(lhs, scope)[1]
+        right = evaluate(rhs, scope)[1]
+
+        evaluate_binary_op(op, left, right)
+      else evaluate(arg, scope)[1]
+      end
+    end
+
+    @executors.push(-> (function) {
+      function.call(*args)
+    })
+
+    @terms.push(callee)
+    [:noop, nil, scope]
+  end
+
+  def evaluate_binary(op, lhs, rhs, scope)
+    @executors.push(-> (left) { 
+      @executors.push(-> (left, right) { 
+        [:raw, evaluate_binary_op(op, left, right), scope]
+      }.curry[left])
+
       [:noop, nil, scope]
-    else raise "Unkonwn term: #{term}"
+    })
+
+    @terms.push(rhs, lhs)
+    [:noop, nil, scope]
+  end
+
+  def evaluate_binary_op(op, lhs, rhs)
+    case [op, lhs, rhs]
+    in ['Add', Integer, Integer]; lhs + rhs
+    in ['Add', _, _]; "#{lhs}#{rhs}"
+    in ['Sub', Integer, Integer]; lhs - rhs
+    in ['Eq', Integer, Integer]; lhs == rhs
+    in ['Lt', Integer, Integer]; lhs < rhs
+    else raise "Unkown operation #{[op, lhs, rhs]}"
     end
   end
 end

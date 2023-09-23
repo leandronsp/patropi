@@ -31,7 +31,7 @@ class ParserTest < Test::Unit::TestCase
 
     assert_equal({ 
       kind: 'Print', value: { 
-        kind: 'BinaryOp', 
+        kind: 'Binary', 
         op: 'Add',
         lhs: { kind: 'Int', value: 40 }, 
         rhs: { kind: 'Int', value: 2 } 
@@ -47,13 +47,13 @@ class ParserTest < Test::Unit::TestCase
 
     assert_equal({ 
       kind: 'Print', value: {
-        kind: 'BinaryOp',
+        kind: 'Binary',
         op: 'Add',
         lhs: { 
           kind: 'Str', value: '40 + 2 = '
         },
         rhs: { 
-          kind: 'BinaryOp',
+          kind: 'Binary',
           op: 'Add',
           lhs: { kind: 'Int', value: 40 },
           rhs: { kind: 'Int', value: 2 }
@@ -86,7 +86,7 @@ class ParserTest < Test::Unit::TestCase
         next: { 
           kind: 'Print', 
           value: { 
-            kind: 'BinaryOp',
+            kind: 'Binary',
             op: 'Add',
             lhs: { kind: 'Var', text: 'a' },
             rhs: { kind: 'Var', text: 'b' }
@@ -143,7 +143,7 @@ class ParserTest < Test::Unit::TestCase
         value: { 
           kind: 'If',
           condition: { 
-            kind: 'BinaryOp',
+            kind: 'Binary',
             op: 'Eq',
             lhs: { kind: 'Var', text: 'a' },
             rhs: { kind: 'Int', value: 42 }
@@ -177,7 +177,7 @@ class ParserTest < Test::Unit::TestCase
           { text: 'b' }
         ],
         value: { 
-          kind: 'BinaryOp',
+          kind: 'Binary',
           op: 'Add',
           lhs: { kind: 'Var', text: 'a' },
           rhs: { kind: 'Var', text: 'b' }
@@ -225,7 +225,7 @@ class ParserTest < Test::Unit::TestCase
         value: { 
           kind: 'If',
           condition: {
-            kind: 'BinaryOp',
+            kind: 'Binary',
             op: 'Eq',
             lhs: { kind: 'Var', text: 'n' },
             rhs: { kind: 'Int', value: 0 }
@@ -236,13 +236,13 @@ class ParserTest < Test::Unit::TestCase
             callee: { kind: 'Var', text: 'sum' },
             arguments: [
               { 
-                kind: 'BinaryOp',
+                kind: 'Binary',
                 op: 'Sub',
                 lhs: { kind: 'Var', text: 'n' },
                 rhs: { kind: 'Int', value: 1 }
               },
               { 
-                kind: 'BinaryOp',
+                kind: 'Binary',
                 op: 'Add',
                 lhs: { kind: 'Var', text: 'acc' },
                 rhs: { kind: 'Var', text: 'n' }

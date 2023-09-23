@@ -15,7 +15,7 @@ class Interpreter
     in { kind: 'Int', value: value }; value.to_i
     in { kind: 'Str', value: value }; value.to_s
     in { kind: 'Bool', value: value }; value
-    in { kind: 'BinaryOp', op: op, lhs: lhs, rhs: rhs }
+    in { kind: 'Binary', op: op, lhs: lhs, rhs: rhs }
       operation = { 'Add' => '+', 'Sub' => '-', 'Eq' => '==', 'Lt' => '<' }[op]
 
       left = evaluate(lhs, scope)

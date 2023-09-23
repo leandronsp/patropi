@@ -19,6 +19,24 @@ def assert_printed_to_stdout(message)
 end
 
 class InterpreterTest < Test::Unit::TestCase
+  def test_interpreter
+    test_print_hello
+    test_print_nested
+    test_print_integer
+    test_print_sum
+    test_print_sub
+    test_print_eq
+    test_print_sum_mixed_types
+    test_print_sub_mixed_types
+    test_print_sum_of_two_variables
+    test_print_if
+    test_print_function
+    test_recursive_sum
+    #test_fibonacci_function
+    test_fibonacci_function_tc_10
+    test_fibonacci_function_tc_1000
+  end
+
   def test_print_hello
     lexer = Lexer.new('print("Hello")')
     parser = Parser.new(lexer)
@@ -26,6 +44,17 @@ class InterpreterTest < Test::Unit::TestCase
     parser.parse!
 
     assert_printed_to_stdout("Hello\n") do 
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
+
+  def test_print_nested
+    lexer = Lexer.new('print(print("Hello"))')
+    parser = Parser.new(lexer)
+
+    parser.parse!
+
+    assert_printed_to_stdout("Hello\nHello\n") do 
       Interpreter.run({ expression: parser.ast }.to_json)
     end
   end
@@ -234,7 +263,35 @@ class InterpreterTest < Test::Unit::TestCase
     end
   end
 
-  def test_fibonacci_function_tc_10_000
+  def test_fibonacci_ruby_tc_trampoline_100000
+    fib = -> (a, b, c) { 
+      if a == 0
+        b
+      else 
+        -> { fib[a - 1, c, b + c] }
+      end
+    }
+
+    result = fib[100000, 0, 1]
+
+    while result.is_a?(Proc)
+      result = result.call
+    end
+
+    puts "Fib: #{result}"
+  end
+
+  def test_fibonacci_ruby_tco_100000
+    def fib(n, a, b)
+      return a if n == 0
+
+      fib(n - 1, b, a + b)
+    end
+
+    puts "Fib: #{fib(100000, 0, 1)}"
+  end
+
+  def test_fibonacci_blaster
     program = <<~PROGRAM
       let fib = fn (n, a, b) => {
         if (n == 0) {
@@ -244,7 +301,7 @@ class InterpreterTest < Test::Unit::TestCase
         }
       };
 
-      print("fib: " + fib(10000, 0, 1))
+      print("fib: " + fib(100000, 0, 1))
     PROGRAM
 
     lexer = Lexer.new(program)

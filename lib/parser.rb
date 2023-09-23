@@ -168,7 +168,7 @@ class Parser
     consume(:BINARY_OP)
 
     { 
-      kind: 'BinaryOp', 
+      kind: 'Binary', 
       op: operation,
       lhs: lhs,
       rhs: parse_current_term
