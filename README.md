@@ -134,6 +134,12 @@ The parser looks at the next token according to the grammar in a recursive top-d
 
 _All the unit tests in this project are already using the built-in Patropi parser. We're yet to implement the remaining language specs, such as Tuples and Location._
 
+## Future development
+
+* LALR parsing
+* LLVM IR
+* Advanced optimizations
+
 ----
 
 [ASCII art generator](http://www.network-science.de/ascii/)
