@@ -51,6 +51,12 @@ Usage: make <target>
   patropi.bench              Run benchmarks
 ```
 
+Optionally you can run directly with `bin/patropi`:
+
+```bash
+$ bin/patropi examples/showcase.rinha
+```
+
 ## Architecture
 
 As mentioned before, Patropi is currently a tree-walking interpreter written in Ruby, implemented for [rinha](https://github.com/aripiprazole/rinha-de-compiler/blob/main/SPECS.md).
