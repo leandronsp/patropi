@@ -7,7 +7,8 @@ class Parser
     '+' => 'Add',
     '-' => 'Sub',
     '==' => 'Eq',
-    '<' => 'Lt'
+    '<' => 'Lt',
+    '||' => 'Or'
   }
 
   def initialize(lexer)
@@ -34,6 +35,7 @@ class Parser
     in [:LET, _]; parse_let
     in [:IF, _]; parse_if_statement
     in [:FUNCTION, _]; parse_function
+    in [:LPAREN, _]; parse_tuple
     end
   end
 
@@ -155,6 +157,19 @@ class Parser
     node = { kind: 'Bool', value: @current_token[1] == 'true' }
     consume(@current_token[0].upcase.to_sym)
 
+    node
+  end
+
+  def parse_tuple
+    node = { kind: 'Tuple', first: {}, second: {} }
+
+    consume(:LPAREN)
+
+    node[:first] = parse_current_term
+    consume(:COMMA)
+    node[:second] = parse_current_term
+
+    consume(:RPAREN)
     node
   end
 

@@ -18,6 +18,7 @@ class Lexer
     '-' => :BINARY_OP,
     '==' => :BINARY_OP,
     '<' => :BINARY_OP,
+    '||' => :BINARY_OP,
     '=' => :ASSIGNMENT,
     ';' => :SEMICOLON,
     '{' => :LBRACE,
@@ -70,8 +71,8 @@ class Lexer
 
   def tokenize_symbol
     # Allowed symbols
-    # ( ) + - ; { } , == => = <
-    if token = @scanner.scan(/[\(\)\+\-\;\{\}\,\<]|\=\=?\>?/)
+    # ( ) + - ; { } , == => = < ||
+    if token = @scanner.scan(/[\(\)\+\-\;\{\}\,\<]|\=\=?\>?|\|{2}/)
       [SYMBOLS[token], token]
     end
   end

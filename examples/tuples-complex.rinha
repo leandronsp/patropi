@@ -1,0 +1,7 @@
+let sum = fn (a, b) => { a + b };
+let other_sum = fn (n) => { sum(n, 2) };
+let tuple = (
+	print(other_sum(10)), 
+	(fn (a, b) => { a - b })(10, 2)
+);
+print(tuple)

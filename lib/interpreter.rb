@@ -1,6 +1,8 @@
 require 'json'
 require 'pry-byebug'
 
+require_relative './ext'
+
 class Interpreter 
   def self.run(*args) = new.run(*args)
 
@@ -32,7 +34,7 @@ class Interpreter
           break if continuation == :noop
         end
       in [:noop, nil]; next
-      else raise "Unkonwn result: #{[continuation, result]}"
+      else raise "Unknown result: #{[continuation, result]}"
       end
     end
   end
@@ -51,13 +53,16 @@ class Interpreter
     in { kind: 'If', condition: condition, then: then_term, otherwise: otherwise_term }; evaluate_if(condition, then_term, otherwise_term, scope)
     in { kind: 'Function', parameters: parameters, value: value }; evaluate_function(parameters, value, scope)
     in { kind: 'Call', callee: callee, arguments: arguments }; evaluate_fn_call(callee, arguments, scope)
-    else raise "Unkonwn term: #{term}"
+    in { kind: 'Tuple', first: first, second: second }; evaluate_tuple(first, second, scope)
+    in { kind: 'First', value: value }; evaluate_tuple_access(value, 0, scope)
+    in { kind: 'Second', value: value }; evaluate_tuple_access(value, 1, scope)
+    else raise "Unknown term: #{term}"
     end
   end
 
   def evaluate_print(next_term, scope)
     @executors.push(-> (result) { 
-      puts result 
+      print "#{result}\n"
       [:raw, result]
     })
 
@@ -94,8 +99,34 @@ class Interpreter
         new_scope[parameter[:text]] = args[index]
       end
 
+      scope = new_scope
+
       @terms.push(value)
       [:noop, nil, new_scope]
+    })
+
+    [:noop, nil, scope]
+  end
+
+  def evaluate_tuple(first, second, scope)
+    @executors.push(-> (first) {
+      @executors.push(-> (second) {
+        [:raw, [first, second], scope]
+      })
+
+      [:noop, nil, scope]
+    })
+
+    @terms.push(second, first)
+
+    [:noop, nil, scope]
+  end
+
+  def evaluate_tuple_access(value, index, scope)
+    @terms.push(value)
+
+    @executors.push(-> (tuple) { 
+      [:raw, tuple[index], scope]
     })
 
     [:noop, nil, scope]
@@ -114,7 +145,7 @@ class Interpreter
     end
 
     @executors.push(-> (function) {
-      function.call(*args)
+      function.call(*args) 
     })
 
     @terms.push(callee)
@@ -122,15 +153,16 @@ class Interpreter
   end
 
   def evaluate_binary(op, lhs, rhs, scope)
+    @terms.push(rhs, lhs)
+
     @executors.push(-> (left) { 
-      @executors.push(-> (left, right) { 
+      @executors.push(-> (right) { 
         [:raw, evaluate_binary_op(op, left, right), scope]
-      }.curry[left])
+      })
 
       [:noop, nil, scope]
     })
 
-    @terms.push(rhs, lhs)
     [:noop, nil, scope]
   end
 
@@ -141,7 +173,8 @@ class Interpreter
     in ['Sub', Integer, Integer]; lhs - rhs
     in ['Eq', Integer, Integer]; lhs == rhs
     in ['Lt', Integer, Integer]; lhs < rhs
-    else raise "Unkown operation #{[op, lhs, rhs]}"
+    in ['Or', _, _]; lhs || rhs
+    else raise "Unknown operation #{[op, lhs, rhs]}"
     end
   end
 end

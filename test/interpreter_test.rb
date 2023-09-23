@@ -32,9 +32,11 @@ class InterpreterTest < Test::Unit::TestCase
     test_print_if
     test_print_function
     test_recursive_sum
-    #test_fibonacci_function
+    test_fibonacci_function
     test_fibonacci_function_tc_10
     test_fibonacci_function_tc_1000
+    test_combination
+    #test_tuple # TODO: fix tuple parsing
   end
 
   def test_print_hello
@@ -281,6 +283,8 @@ class InterpreterTest < Test::Unit::TestCase
     puts "Fib: #{result}"
   end
 
+  # Requires
+  # RubyVM::InstructionSequence.compile_option = { tailcall_optimization: true }
   def test_fibonacci_ruby_tco_100000
     def fib(n, a, b)
       return a if n == 0
@@ -310,5 +314,46 @@ class InterpreterTest < Test::Unit::TestCase
 
     # run without StackOverflowError
     Interpreter.run({ expression: parser.ast }.to_json)
+  end
+
+  def test_combination
+    program = <<~PROGRAM
+      let combination = fn (n, k) => {
+          let a = k == 0;
+          let b = k == n;
+          if (a || b)
+          {
+              1
+          }
+          else {
+              combination(n - 1, k - 1) + combination(n - 1, k)
+          }
+      };
+
+      print(combination(10, 2))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
+
+    assert_printed_to_stdout("45\n") do
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
+
+  def test_tuple
+    program = <<~PROGRAM
+      let person = ("Leandro", 42);
+      print("Tuple: " + person + " | First: " + first(person) + " | Second: " + second(person))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
+
+    assert_printed_to_stdout("Tuple: (Leandro, 42) | First: Leandro | Second: 42\n") do
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
   end
 end
