@@ -5,18 +5,14 @@ SHELL = /bin/bash
 help: ## Prints available commands
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage: make \033[36m<target>\033[0m\n"} /^[.a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-bash:
-	@docker compose run ruby bash
+patropi.build: ## Build Patropi
+	@docker build -t patropi .
 
-rinha.setup: ## Setup
-	@docker compose run ruby bundle
-	@cargo install rinha
+patropi.hello: ## Run hello world
+	@bin/patropi examples/hello.rinha
 
-rinha.run: ## Run interpreter from STDIN
-	@docker compose run --rm --no-TTY ruby ruby patropi.rb
+patropi.test: ## Run tests
+	@bin/test
 
-rinha.hello: ## Run a sample hello world
-	@rinha examples/hello.rinha | jq | tee examples/hello.json | make rinha.run
-
-rinha.test: ## Run tests
-	@docker compose run --rm --no-TTY ruby ruby -Itest test/all.rb
+patropi.bench: ## Run benchmarks
+	@bin/bench

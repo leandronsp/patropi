@@ -1,5 +1,3 @@
-require 'byebug'
-
 class Parser
   attr_reader :ast
 

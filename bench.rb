@@ -1,4 +1,4 @@
-RubyVM::InstructionSequence.compile_option = { tailcall_optimization: true }
+#RubyVM::InstructionSequence.compile_option = { tailcall_optimization: true }
 # frozen_string_literal: true
 
 require_relative './lib/lexer'

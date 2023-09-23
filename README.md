@@ -17,6 +17,7 @@ Yet another Ruby interpreter for [Rinha de Compiladores](https://github.com/arip
 ## Requirements
 
 * [Docker](https://docs.docker.com/get-docker/)
+* [rinha](https://crates.io/crates/rinha)
 * Make (optional)
 
 ## Stack
@@ -30,10 +31,10 @@ $ make help
 
 Usage: make <target>
   help                       Prints available commands
-  rinha.setup                Setup
-  rinha.run                  Run interpreter from STDIN
-  rinha.hello                Run a sample hello world
-  rinha.test                 Run tests
+  patropi.build              Build Patropi
+  patropi.hello              Run hello world
+  patropi.test               Run tests
+  patropi.bench              Run benchmarks
 ```
 
 ## Generating the AST's

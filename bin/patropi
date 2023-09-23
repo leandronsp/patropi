@@ -1,0 +1,3 @@
+#!/bin/bash
+
+rinha $1 | docker run --rm -i patropi
