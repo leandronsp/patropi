@@ -19,26 +19,6 @@ def assert_printed_to_stdout(message)
 end
 
 class InterpreterTest < Test::Unit::TestCase
-  def test_interpreter
-    test_print_hello
-    test_print_nested
-    test_print_integer
-    test_print_sum
-    test_print_sub
-    test_print_eq
-    test_print_sum_mixed_types
-    test_print_sub_mixed_types
-    test_print_sum_of_two_variables
-    test_print_if
-    test_print_function
-    test_recursive_sum
-    test_fibonacci_function
-    test_fibonacci_function_tc_10
-    test_fibonacci_function_tc_1000
-    test_combination
-    #test_tuple # TODO: fix tuple parsing
-  end
-
   def test_print_hello
     lexer = Lexer.new('print("Hello")')
     parser = Parser.new(lexer)
