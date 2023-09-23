@@ -271,6 +271,23 @@ class InterpreterTest < Test::Unit::TestCase
     end
   end
 
+  def test_print_closure
+    program = <<~PROGRAM
+      let add = fn(a, b) => { 
+        a + b 
+      };
+      print(add)
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
+
+    assert_printed_to_stdout("<#closure>\n") do
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
+
   #def test_tuple
   #  program = <<~PROGRAM
   #    let person = ("Leandro", 42);

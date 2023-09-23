@@ -1,0 +1,61 @@
+let _ = print("1 + 2 = " + 1 + 2);
+let _ = print("2 * 2 = " + 2 * 2);
+let _ = print("3 / 2 = " + 3 / 2);
+let _ = print("3 != 1 + 1 = " + 3 != 1 + 1);
+let _ = print(1 <= 2);
+let _ = print(1 >= 2);
+let _ = print(1 > 2);
+let _ = print(true && false);
+let _ = print(true || false);
+let _ = print("4 % 2 = " + 4 % 2);
+let _ = print(("Leandro", 42));
+let _ = print(first(("Leandro", 42)));
+let _ = print("Done with basics. Doing something more complex...");
+let _ = print("#########################");
+let sum = fn(a, b) => { a + b };
+let _ = print("Just printing the closure 'sum': " + sum);
+let _ = print("sum(40, 2) = " + sum(40, 2));
+let _ = print(if (true) { "eh verdade" } else { "eh mentira "});
+let _ = print(print("Nested print"));
+let other_sum = fn (n) => { sum(n, 2) };
+let _ = print((
+	print("Other sum e tuplas: " + other_sum(10)), 
+	(fn (a, b) => { a - b })(10, 2)
+));
+let rsum = fn (n) => {
+  if (n == 1) {
+    n
+  } else {
+    n + rsum(n - 1)
+  }
+};
+let _ = print("rsum(5) = " + rsum(5));
+let combination = fn (n, k) => {
+    let a = k == 0;
+    let b = k == n;
+    if (a || b)
+    {
+        1
+    }
+    else {
+        combination(n - 1, k - 1) + combination(n - 1, k)
+    }
+};
+let _ = print("combination(10, 2) = " + combination(10, 2));
+let fib = fn (n) => {
+  if (n < 2) {
+    n
+  } else {
+    fib(n - 1) + fib(n - 2)
+  }
+};
+let _ = print("fib(10): " + fib(10));
+let fib_tc = fn (n, a, b) => {
+  if (n == 0) {
+    a
+  } else {
+    fib_tc(n - 1, b, a + b)
+  }
+};
+let _ = print("fib_tc(100): " + fib_tc(100, 0, 1));
+print("Done showcase")

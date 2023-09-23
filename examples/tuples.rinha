@@ -1,2 +1,0 @@
-let person = ("Leandro", 42);
-print("Tuple: " + person + " | First: " + first(person) + " | Second: " + second(person))

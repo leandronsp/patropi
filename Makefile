@@ -11,6 +11,9 @@ patropi.build: ## Build Patropi
 patropi.hello: ## Run hello world
 	@bin/patropi examples/hello.rinha
 
+patropi.showcase: # Run showcase examples
+	@bin/patropi examples/showcase.rinha
+
 patropi.test: ## Run tests
 	@bin/test
 

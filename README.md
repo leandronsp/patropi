@@ -46,6 +46,7 @@ Usage: make <target>
   help                       Prints available commands
   patropi.build              Build Patropi
   patropi.hello              Run hello world
+  patropi.showcase           Run showcase examples
   patropi.test               Run tests
   patropi.bench              Run benchmarks
 ```
