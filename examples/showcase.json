@@ -2202,10 +2202,10 @@
                                                                 "kind": "Binary",
                                                                 "lhs": {
                                                                   "kind": "Str",
-                                                                  "value": "fib_tc(100): ",
+                                                                  "value": "fib_tc(10000): ",
                                                                   "location": {
                                                                     "start": 1490,
-                                                                    "end": 1505,
+                                                                    "end": 1507,
                                                                     "filename": "examples/showcase.rinha"
                                                                   }
                                                                 },
@@ -2216,18 +2216,18 @@
                                                                     "kind": "Var",
                                                                     "text": "fib_tc",
                                                                     "location": {
-                                                                      "start": 1508,
-                                                                      "end": 1514,
+                                                                      "start": 1510,
+                                                                      "end": 1516,
                                                                       "filename": "examples/showcase.rinha"
                                                                     }
                                                                   },
                                                                   "arguments": [
                                                                     {
                                                                       "kind": "Int",
-                                                                      "value": 100,
+                                                                      "value": 10000,
                                                                       "location": {
-                                                                        "start": 1515,
-                                                                        "end": 1518,
+                                                                        "start": 1517,
+                                                                        "end": 1522,
                                                                         "filename": "examples/showcase.rinha"
                                                                       }
                                                                     },
@@ -2235,8 +2235,8 @@
                                                                       "kind": "Int",
                                                                       "value": 0,
                                                                       "location": {
-                                                                        "start": 1520,
-                                                                        "end": 1521,
+                                                                        "start": 1524,
+                                                                        "end": 1525,
                                                                         "filename": "examples/showcase.rinha"
                                                                       }
                                                                     },
@@ -2244,27 +2244,27 @@
                                                                       "kind": "Int",
                                                                       "value": 1,
                                                                       "location": {
-                                                                        "start": 1523,
-                                                                        "end": 1524,
+                                                                        "start": 1527,
+                                                                        "end": 1528,
                                                                         "filename": "examples/showcase.rinha"
                                                                       }
                                                                     }
                                                                   ],
                                                                   "location": {
-                                                                    "start": 1508,
-                                                                    "end": 1525,
+                                                                    "start": 1510,
+                                                                    "end": 1529,
                                                                     "filename": "examples/showcase.rinha"
                                                                   }
                                                                 },
                                                                 "location": {
                                                                   "start": 1490,
-                                                                  "end": 1525,
+                                                                  "end": 1529,
                                                                   "filename": "examples/showcase.rinha"
                                                                 }
                                                               },
                                                               "location": {
                                                                 "start": 1484,
-                                                                "end": 1526,
+                                                                "end": 1530,
                                                                 "filename": "examples/showcase.rinha"
                                                               }
                                                             },
@@ -2274,194 +2274,194 @@
                                                                 "kind": "Str",
                                                                 "value": "Done showcase",
                                                                 "location": {
-                                                                  "start": 1534,
-                                                                  "end": 1549,
+                                                                  "start": 1538,
+                                                                  "end": 1553,
                                                                   "filename": "examples/showcase.rinha"
                                                                 }
                                                               },
                                                               "location": {
-                                                                "start": 1528,
-                                                                "end": 1550,
+                                                                "start": 1532,
+                                                                "end": 1554,
                                                                 "filename": "examples/showcase.rinha"
                                                               }
                                                             },
                                                             "location": {
                                                               "start": 1476,
-                                                              "end": 1550,
+                                                              "end": 1554,
                                                               "filename": "examples/showcase.rinha"
                                                             }
                                                           },
                                                           "location": {
                                                             "start": 1377,
-                                                            "end": 1550,
+                                                            "end": 1554,
                                                             "filename": "examples/showcase.rinha"
                                                           }
                                                         },
                                                         "location": {
                                                           "start": 1339,
-                                                          "end": 1550,
+                                                          "end": 1554,
                                                           "filename": "examples/showcase.rinha"
                                                         }
                                                       },
                                                       "location": {
                                                         "start": 1250,
-                                                        "end": 1550,
+                                                        "end": 1554,
                                                         "filename": "examples/showcase.rinha"
                                                       }
                                                     },
                                                     "location": {
                                                       "start": 1189,
-                                                      "end": 1550,
+                                                      "end": 1554,
                                                       "filename": "examples/showcase.rinha"
                                                     }
                                                   },
                                                   "location": {
                                                     "start": 1000,
-                                                    "end": 1550,
+                                                    "end": 1554,
                                                     "filename": "examples/showcase.rinha"
                                                   }
                                                 },
                                                 "location": {
                                                   "start": 961,
-                                                  "end": 1550,
+                                                  "end": 1554,
                                                   "filename": "examples/showcase.rinha"
                                                 }
                                               },
                                               "location": {
                                                 "start": 878,
-                                                "end": 1550,
+                                                "end": 1554,
                                                 "filename": "examples/showcase.rinha"
                                               }
                                             },
                                             "location": {
                                               "start": 776,
-                                              "end": 1550,
+                                              "end": 1554,
                                               "filename": "examples/showcase.rinha"
                                             }
                                           },
                                           "location": {
                                             "start": 735,
-                                            "end": 1550,
+                                            "end": 1554,
                                             "filename": "examples/showcase.rinha"
                                           }
                                         },
                                         "location": {
                                           "start": 697,
-                                          "end": 1550,
+                                          "end": 1554,
                                           "filename": "examples/showcase.rinha"
                                         }
                                       },
                                       "location": {
                                         "start": 632,
-                                        "end": 1550,
+                                        "end": 1554,
                                         "filename": "examples/showcase.rinha"
                                       }
                                     },
                                     "location": {
                                       "start": 587,
-                                      "end": 1550,
+                                      "end": 1554,
                                       "filename": "examples/showcase.rinha"
                                     }
                                   },
                                   "location": {
                                     "start": 529,
-                                    "end": 1550,
+                                    "end": 1554,
                                     "filename": "examples/showcase.rinha"
                                   }
                                 },
                                 "location": {
                                   "start": 496,
-                                  "end": 1550,
+                                  "end": 1554,
                                   "filename": "examples/showcase.rinha"
                                 }
                               },
                               "location": {
                                 "start": 452,
-                                "end": 1550,
+                                "end": 1554,
                                 "filename": "examples/showcase.rinha"
                               }
                             },
                             "location": {
                               "start": 384,
-                              "end": 1550,
+                              "end": 1554,
                               "filename": "examples/showcase.rinha"
                             }
                           },
                           "location": {
                             "start": 345,
-                            "end": 1550,
+                            "end": 1554,
                             "filename": "examples/showcase.rinha"
                           }
                         },
                         "location": {
                           "start": 313,
-                          "end": 1550,
+                          "end": 1554,
                           "filename": "examples/showcase.rinha"
                         }
                       },
                       "location": {
                         "start": 278,
-                        "end": 1550,
+                        "end": 1554,
                         "filename": "examples/showcase.rinha"
                       }
                     },
                     "location": {
                       "start": 248,
-                      "end": 1550,
+                      "end": 1554,
                       "filename": "examples/showcase.rinha"
                     }
                   },
                   "location": {
                     "start": 218,
-                    "end": 1550,
+                    "end": 1554,
                     "filename": "examples/showcase.rinha"
                   }
                 },
                 "location": {
                   "start": 196,
-                  "end": 1550,
+                  "end": 1554,
                   "filename": "examples/showcase.rinha"
                 }
               },
               "location": {
                 "start": 173,
-                "end": 1550,
+                "end": 1554,
                 "filename": "examples/showcase.rinha"
               }
             },
             "location": {
               "start": 150,
-              "end": 1550,
+              "end": 1554,
               "filename": "examples/showcase.rinha"
             }
           },
           "location": {
             "start": 105,
-            "end": 1550,
+            "end": 1554,
             "filename": "examples/showcase.rinha"
           }
         },
         "location": {
           "start": 70,
-          "end": 1550,
+          "end": 1554,
           "filename": "examples/showcase.rinha"
         }
       },
       "location": {
         "start": 35,
-        "end": 1550,
+        "end": 1554,
         "filename": "examples/showcase.rinha"
       }
     },
     "location": {
       "start": 0,
-      "end": 1550,
+      "end": 1554,
       "filename": "examples/showcase.rinha"
     }
   },
   "location": {
     "start": 0,
-    "end": 1550,
+    "end": 1554,
     "filename": "examples/showcase.rinha"
   }
 }

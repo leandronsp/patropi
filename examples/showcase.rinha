@@ -57,5 +57,5 @@ let fib_tc = fn (n, a, b) => {
     fib_tc(n - 1, b, a + b)
   }
 };
-let _ = print("fib_tc(100): " + fib_tc(100, 0, 1));
+let _ = print("fib_tc(10000): " + fib_tc(10000, 0, 1));
 print("Done showcase")
