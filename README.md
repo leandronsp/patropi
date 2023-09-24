@@ -20,14 +20,20 @@ As of 2023' September, Patropi is a [tree-walking interpreter](https://craftingi
 
 ## Somente para a rinha
 
+Em caso se for necessário o build local:
 ```bash
 $ docker build -t patropi .
+```
 
+Ou, caso prefira buscar a imagem no Docker Hub:
+
+```bash
 $ docker run \
   -v ./examples/showcase.json:/var/rinha/source.rinha.json \
   --memory=2gb \
   --cpus=2 \
   patropi
+
 ```
 
 ## Requirements
