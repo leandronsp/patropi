@@ -18,6 +18,18 @@ Yet another implementation for [rinha](https://github.com/aripiprazole/rinha-de-
 
 As of 2023' September, Patropi is a [tree-walking interpreter](https://craftinginterpreters.com/a-tree-walk-interpreter.html) written entirely in Ruby 3.2 [+YJIT](https://shopify.engineering/ruby-yjit-is-production-ready).
 
+## Somente para a rinha
+
+```bash
+$ docker build -t patropi .
+
+$ docker run \
+  -v ./examples/showcase.json:/var/rinha/source.rinha.json \
+  --memory=2gb \
+  --cpus=2 \
+  patropi
+```
+
 ## Requirements
 
 * [Docker](https://docs.docker.com/get-docker/)
