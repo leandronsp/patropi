@@ -19,3 +19,8 @@ patropi.test: ## Run tests
 
 patropi.bench: ## Run benchmarks
 	@bin/bench
+
+docker.push : ## Push docker image
+	@docker build -t patropi .
+	@docker tag patropi leandronsp/patropi
+	@docker push leandronsp/patropi
