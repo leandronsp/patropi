@@ -159,7 +159,7 @@ class Interpreter
       end
     end
 
-    cache_key = "#{callee[:text]}(#{args.join(', ')})"
+    cache_key = "#{callee[:text]}(#{args[0]})"
 
     @executors.push(-> (function) {
       begin 

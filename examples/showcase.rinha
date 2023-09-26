@@ -49,7 +49,7 @@ let fib = fn (n) => {
     fib(n - 1) + fib(n - 2)
   }
 };
-let _ = print("fib(10): " + fib(10));
+let _ = print("fib(46): " + fib(46));
 let fib_tc = fn (n, a, b) => {
   if (n == 0) {
     a
