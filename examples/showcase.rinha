@@ -75,4 +75,24 @@ let g = fn (n) => {
   f(n * 3)
 };
 let _ = print(g(10));
+let factorial = fn (n) => {
+  if (n == 0) {
+    1
+  } else {
+    n * factorial(n -1)
+  }
+};
+let _ = print(factorial(12));
+let power = fn (x, n) => {
+  if (n == 0) {
+    1
+  } else {
+    if (x == 0) {
+      0
+    } else {
+      x * power(x, n - 1)
+    }
+  }
+};
+let _ = print(power(2, 10));
 print("Done showcase")
