@@ -64,4 +64,15 @@ let _ = (fn (sum) => {
 let execute = fn (func, n) => { func(n) };
 let result = execute(fn (n) => { n * n }, 4);  
 let _ = print(result);
+let f = fn (n) => {
+  if (n > 42) {
+    print(42)
+  } else {
+    n
+  }
+};
+let g = fn (n) => {
+  f(n * 3)
+};
+let _ = print(g(10));
 print("Done showcase")
