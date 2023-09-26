@@ -264,4 +264,91 @@ class ParserTest < Test::Unit::TestCase
       }
     }, parser.ast)
   end
+
+  def test_tuple_first
+    program = <<~PROGRAM
+      let person = ("Leandro", 42);
+      print(first(person))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+
+    parser.parse!
+
+    assert_equal({ 
+      kind: 'Let',
+      name: { text: 'person' },
+      value: { 
+        kind: 'Tuple',
+        first: { kind: 'Str', value: 'Leandro' },
+        second: { kind: 'Int', value: 42 },
+      },
+      next: { 
+        kind: 'Print',
+        value: { 
+          kind: 'First', 
+          value: { 
+            kind: 'Var',
+            text: 'person'
+          }
+        }
+      }
+    }, parser.ast)
+  end
+
+  def test_tuple_second
+    program = <<~PROGRAM
+      let person = ("Leandro", 42);
+      print(second(person))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+
+    parser.parse!
+
+    assert_equal({ 
+      kind: 'Let',
+      name: { text: 'person' },
+      value: { 
+        kind: 'Tuple',
+        first: { kind: 'Str', value: 'Leandro' },
+        second: { kind: 'Int', value: 42 },
+      },
+      next: { 
+        kind: 'Print',
+        value: { 
+          kind: 'Second', 
+          value: { 
+            kind: 'Var',
+            text: 'person'
+          }
+        }
+      }
+    }, parser.ast)
+  end
+
+  def test_tuple_anonymous
+    program = <<~PROGRAM
+      print(first(("Leandro", 42)))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+
+    parser.parse!
+
+    assert_equal({ 
+      kind: 'Print',
+      value: { 
+        kind: 'First',
+        value: { 
+          kind: 'Tuple',
+          first: { kind: 'Str', value: 'Leandro' },
+          second: { kind: 'Int', value: 42 },
+        }
+      }
+    }, parser.ast)
+  end
 end

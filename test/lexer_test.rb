@@ -249,4 +249,32 @@ class LexerTest < Test::Unit::TestCase
       [:RPAREN, ')']
     ], lexer.tokenize)
   end
+
+  def test_tuple 
+    program = <<~PROGRAM
+      let person = ("Leandro", 42);
+      print(first(person))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+
+    assert_equal([ 
+      [:LET, 'let'],
+      [:IDENTIFIER, 'person'],
+      [:ASSIGNMENT, '='],
+      [:LPAREN, '('],
+      [:STRING, 'Leandro'],
+      [:COMMA, ','],
+      [:NUMBER, '42'],
+      [:RPAREN, ')'],
+      [:SEMICOLON, ';'],
+      [:PRINT, 'print'],
+      [:LPAREN, '('],
+      [:IDENTIFIER, 'first'],
+      [:LPAREN, '('],
+      [:IDENTIFIER, 'person'],
+      [:RPAREN, ')'],
+      [:RPAREN, ')']
+    ], lexer.tokenize)
+  end
 end

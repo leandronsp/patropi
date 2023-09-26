@@ -1,3 +1,4 @@
+require 'byebug'
 class Parser
   attr_reader :ast
 
@@ -123,13 +124,49 @@ class Parser
     node
   end
 
+  def parse_tuple_call(identifier)
+    if @current_token[0] == :LPAREN
+      consume(:LPAREN)
+
+      first = parse_current_term
+      consume(:COMMA)
+      second = parse_current_term
+
+      tuple_node = { kind: 'Tuple', first: first, second: second }
+
+      if identifier == 'first'
+        { kind: 'First', value: tuple_node }
+      else 
+        { kind: 'Second', value: tuple_node }
+      end
+    else 
+      tuple_name = @current_token[1]
+      consume(:IDENTIFIER)
+      
+      node = { kind: 'Var', text: tuple_name }
+
+      if identifier == 'first'
+        { kind: 'First', value: node }
+      else 
+        { kind: 'Second', value: node }
+      end
+    end
+  end
+
   def parse_identifier
+    identifier = @current_token[1]
     node = { kind: 'Var', text: @current_token[1] }
     consume(:IDENTIFIER)
 
     if @current_token[0] == :LPAREN # function call
       consume(:LPAREN)
-      function_call_node = maybe_binary_op { parse_function_call(node) }
+
+      if %w[first second].include?(identifier)
+        function_call_node = maybe_binary_op { parse_tuple_call(identifier) }
+      else 
+        function_call_node = maybe_binary_op { parse_function_call(node) }
+      end
+
       consume(:RPAREN)
       return function_call_node
     end

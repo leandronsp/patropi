@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'byebug'
 
 require 'test/unit'
 require 'json'
@@ -288,18 +289,33 @@ class InterpreterTest < Test::Unit::TestCase
     end
   end
 
-  #def test_tuple
-  #  program = <<~PROGRAM
-  #    let person = ("Leandro", 42);
-  #    print("Tuple: " + person + " | First: " + first(person) + " | Second: " + second(person))
-  #  PROGRAM
+  def test_tuple
+    program = <<~PROGRAM
+      let person = ("Leandro", 42);
+      print("Tuple: " + person)
+    PROGRAM
 
-  #  lexer = Lexer.new(program)
-  #  parser = Parser.new(lexer)
-  #  parser.parse!
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
 
-  #  assert_printed_to_stdout("Tuple: (Leandro, 42) | First: Leandro | Second: 42\n") do
-  #    Interpreter.run({ expression: parser.ast }.to_json)
-  #  end
-  #end
+    assert_printed_to_stdout("Tuple: (Leandro, 42)\n") do
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
+
+  def test_tuple_complex
+    program = <<~PROGRAM
+      let person = ("Leandro", 42);
+      print(first(person))
+    PROGRAM
+
+    lexer = Lexer.new(program)
+    parser = Parser.new(lexer)
+    parser.parse!
+
+    assert_printed_to_stdout("Leandro\n") do
+      Interpreter.run({ expression: parser.ast }.to_json)
+    end
+  end
 end
