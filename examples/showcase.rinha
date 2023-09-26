@@ -58,4 +58,10 @@ let fib_tc = fn (n, a, b) => {
   }
 };
 let _ = print("fib_tc(10000): " + fib_tc(10000, 0, 1));
+let _ = (fn (sum) => {
+  print(sum(10, 12))
+})(fn (a, b) => { a + b });
+let execute = fn (func, n) => { func(n) };
+let result = execute(fn (n) => { n * n }, 4);  
+let _ = print(result);
 print("Done showcase")
