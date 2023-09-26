@@ -1,8 +1,8 @@
-let fib = fn (n, a, b) => {
-  if (n == 0) {
-    a
+let fib = fn (n) => {
+  if (n < 2) {
+    n
   } else {
-    fib(n - 1, b, a + b)
+    fib(n - 1) + fib(n - 2)
   }
 };
-print("fib = " + fib(100000, 0, 1))
+print("fib = " + fib(46))

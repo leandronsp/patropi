@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require 'byebug'
 
 require 'test/unit'
 require 'json'
