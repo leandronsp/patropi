@@ -50,7 +50,7 @@ end
 
 require 'benchmark'
 
-number = 10_000
+number = 100_000
 
 Benchmark.bm do |x|
   x.report('patropi') { patropi(rinha.call(number)) }

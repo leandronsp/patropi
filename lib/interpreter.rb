@@ -9,7 +9,6 @@ class Interpreter
   def initialize
     @terms = []
     @executors = []
-    @fn_cache = {}
   end
 
   def run(json_input)
@@ -159,20 +158,9 @@ class Interpreter
       end
     end
 
-    cache_key = "#{callee[:text]}(#{args.join(', ')})"
-
     @executors.push(-> (function) {
       begin 
-        if result = @fn_cache[cache_key]
-          [:raw, result, scope, location]
-        else 
-          @executors.push(-> (result) { 
-            @fn_cache[cache_key] = result
-            [:raw, result, scope, location]
-          })
-
-          function.call(*args) 
-        end
+        function.call(*args)
       rescue => e
         raise Error.new(location, "Cannot call #{function} with #{args}: #{e.message}")
       end

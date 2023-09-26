@@ -1,0 +1,8 @@
+let loop = fn (i, s) => {
+   if (i == 0) {
+     s
+   } else {
+      loop(i-1, s+1)
+   }
+};
+print(loop(2000000000, 0))
