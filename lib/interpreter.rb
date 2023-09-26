@@ -103,7 +103,7 @@ class Interpreter
   end
 
   def evaluate_function(parameters, value, scope, location)
-    @executors.pop.call(-> (*args) { 
+    func = -> (*args) { 
       new_scope = scope.dup
 
       parameters.each_with_index do |param, index|
@@ -114,8 +114,9 @@ class Interpreter
       @terms.push(value)
 
       [:noop, nil, new_scope, location]
-    })
+    }
 
+    @executors.pop.call(func)
     [:noop, nil, scope, location]
   end
 
@@ -154,6 +155,22 @@ class Interpreter
         right = evaluate(data[:rhs], scope, data[:location])[1]
 
         evaluate_binary_op(data[:op], left, right, data[:location])
+      in { kind: 'Function', **data }
+        parameters = data[:parameters]
+        value = data[:value]
+
+        -> (*args) { 
+          new_scope = scope.dup
+
+          parameters.each_with_index do |param, index|
+            new_scope[param[:text]] = args[index]
+          end
+
+          scope = new_scope
+          @terms.push(value)
+
+          [:noop, nil, new_scope, data[:location]]
+        }
       else evaluate(arg, scope, location)[1]
       end
     end
