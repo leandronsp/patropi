@@ -1,3 +1,11 @@
-(fn (sum) => {
-  print(sum(10, 12))
-})(fn (a, b) => { a + b })
+let _ = print("@!compile::");
+
+let fibbo = fn (n) => {
+  if (n < 2) {
+    n
+  } else {
+    fibbo(n - 1) + fibbo(n - 2)
+  }
+};
+
+print("@!fibbo::" + fibbo(35) + "")

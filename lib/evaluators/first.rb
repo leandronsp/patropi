@@ -9,17 +9,22 @@ class Evaluators::Print
   end
 
   def evaluate
-    @executors.push(-> (result) { 
+    @executors.push(executor)
+    @terms.push(@data[:value])
+
+    [:noop, nil, @scope, @data[:location]]
+  end
+
+  private
+
+  def executor
+    -> (result) { 
       begin
         print "#{result}\n"
         [:raw, result, @scope, @data[:location]]
       rescue => e
         raise Error.new(@data[:location], "Cannot print #{result}: #{e.message}")
       end
-    })
-
-    @terms.push(@data[:value])
-
-    [:noop, nil, @scope, @data[:location]]
+    }
   end
 end

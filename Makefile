@@ -24,3 +24,6 @@ docker.push : ## Push docker image
 	@docker build -t patropi .
 	@docker tag patropi leandronsp/patropi
 	@docker push leandronsp/patropi
+
+docker.stats: ## Docker stats
+	@docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.MemPerc}}"
