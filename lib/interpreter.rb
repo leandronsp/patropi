@@ -1,49 +1,19 @@
-require 'json'
-
-require_relative 'ext'
-require_relative 'error'
-
 class Interpreter 
   def self.run(*args) = new.run(*args)
 
   def initialize
     @terms = []
     @executors = []
+    @trampoline = Trampoline.new(@terms, @executors)
   end
 
   def run(json_input)
     parsed = JSON.parse(json_input, symbolize_names: true)
 
-    term = parsed[:expression]
-    location = parsed[:location]
+    @terms.push(parsed[:expression])
 
-    @terms.push(term)
-    scope = {}
-
-    # Trampoline
-    loop do 
-      term = @terms.pop
-      break if term.nil?
-      continuation, result, scope, location = evaluate(term, scope, location)
-
-      begin 
-        case [continuation, result]
-        in [:raw, result]
-          executor = @executors.pop
-          continuation, result, scope, location = executor&.call(result)
-
-          next if continuation == :noop
-
-          while executor = @executors.pop
-            continuation, result, scope, location = executor&.call(result)
-            break if continuation == :noop
-          end
-        in [:noop, nil]; next
-        else raise Error.new(location, "Unknown continuation: #{continuation} with #{result}")
-        end
-      rescue => e
-        raise Error.new(location, "Unexpected error while evaluating continuation: #{e.message}")
-      end
+    @trampoline.run do |term, scope, location|
+      evaluate(term, scope, location)
     end
   end
 
@@ -54,6 +24,7 @@ class Interpreter
     in { kind: 'Str',  **data }; [:raw, data[:value].to_s,  scope, data[:location]]
     in { kind: 'Var',  **data }; [:raw, scope[data[:text]], scope, data[:location]]
 
+    in { kind: 'Print',    **data }; evaluate_print(data, scope)
     in { kind: 'Print',    **data }; evaluate_print(data, scope)
     in { kind: 'Binary',   **data }; evaluate_binary(data, scope)
     in { kind: 'Let',      **data }; evaluate_let(data, scope)

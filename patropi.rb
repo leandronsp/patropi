@@ -1,4 +1,9 @@
-require_relative './lib/interpreter'
+require 'json'
+
+require_relative 'lib/ext'
+require_relative 'lib/error'
+require_relative 'lib/trampoline'
+require_relative 'lib/interpreter'
 
 # Read from stdin until EOF
 input = ""
