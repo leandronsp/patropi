@@ -10,8 +10,6 @@ let _ = print(true || false);
 let _ = print("4 % 2 = " + 4 % 2);
 let _ = print(("Leandro", 42));
 let _ = print(first(("Leandro", 42)));
-let _ = print("Done with basics. Doing something more complex...");
-let _ = print("#########################");
 let sum = fn(a, b) => { a + b };
 let _ = print("Just printing the closure 'sum': " + sum);
 let _ = print("sum(40, 2) = " + sum(40, 2));

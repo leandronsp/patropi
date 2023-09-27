@@ -20,6 +20,9 @@ patropi.test: ## Run tests
 patropi.bench: ## Run benchmarks
 	@bin/bench
 
+patropi.check: ## Check everything is OK
+	@bin/check
+
 docker.push : ## Push docker image
 	@docker build -t patropi .
 	@docker tag patropi leandronsp/patropi
@@ -27,4 +30,3 @@ docker.push : ## Push docker image
 
 docker.stats: ## Docker stats
 	@docker stats --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.MemPerc}}"
-

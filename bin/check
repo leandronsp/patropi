@@ -1,0 +1,23 @@
+#!/bin/bash
+
+echo -e "\n############### Building Patropi ####################\n"
+make patropi.build
+
+echo -e "\n############### Unit Tests ####################\n"
+make patropi.test
+
+echo -e "\n############### Showcase ####################\n"
+make patropi.showcase
+
+echo -e "\n############### Benchmark ####################\n"
+make patropi.bench
+
+echo -e "\n############### Demo (examples/test.rinha) ####################\n"
+rinha examples/test.rinha > examples/test.json
+docker run \
+	-v $(pwd)/examples/test.json:/var/rinha/source.rinha.json \
+	--memory=2g \
+	--cpus=2 \
+	patropi
+
+echo -e "\n############### Done ####################\n"
