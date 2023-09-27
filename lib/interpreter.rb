@@ -1,3 +1,9 @@
+require 'json'
+
+require_relative 'error'
+require_relative 'ext'
+require_relative 'trampoline'
+
 class Interpreter 
   def self.run(*args) = new.run(*args)
 
@@ -24,7 +30,6 @@ class Interpreter
     in { kind: 'Str',  **data }; [:raw, data[:value].to_s,  scope, data[:location]]
     in { kind: 'Var',  **data }; [:raw, scope[data[:text]], scope, data[:location]]
 
-    in { kind: 'Print',    **data }; evaluate_print(data, scope)
     in { kind: 'Print',    **data }; evaluate_print(data, scope)
     in { kind: 'Binary',   **data }; evaluate_binary(data, scope)
     in { kind: 'Let',      **data }; evaluate_let(data, scope)

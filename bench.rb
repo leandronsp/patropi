@@ -1,9 +1,11 @@
 #RubyVM::InstructionSequence.compile_option = { tailcall_optimization: true }
 # frozen_string_literal: true
 
-require_relative './lib/lexer'
-require_relative './lib/parser'
-require_relative './lib/interpreter'
+require 'json'
+
+require_relative 'lib/lexer'
+require_relative 'lib/parser'
+require_relative 'lib/interpreter'
 
 def patropi(program)
   lexer = Lexer.new(program)
