@@ -49,25 +49,28 @@ class Interpreter
 
   def evaluate(term, scope, location)
     case term
-    in { kind: 'Str', **data }; [:raw, data[:value].to_s, scope, data[:location]]
-    in { kind: 'Int', **data }; [:raw, data[:value].to_i, scope, data[:location]]
-    in { kind: 'Bool', **data }; [:raw, data[:value], scope, data[:location]]
+    in { kind: 'Bool', **data }; [:raw, data[:value],       scope, data[:location]]
+    in { kind: 'Int',  **data }; [:raw, data[:value].to_i,  scope, data[:location]]
+    in { kind: 'Str',  **data }; [:raw, data[:value].to_s,  scope, data[:location]]
+    in { kind: 'Var',  **data }; [:raw, scope[data[:text]], scope, data[:location]]
 
-    in { kind: 'Print', **data }; evaluate_print(data[:value], scope, data[:location])
-    in { kind: 'Binary', **data }; evaluate_binary(data[:op], data[:lhs], data[:rhs], scope, data[:location])
-    in { kind: 'Let', **data }; evaluate_let(data[:name][:text], data[:value], data[:next], scope, data[:location])
-    in { kind: 'Var', **data }; [:raw, scope[data[:text]], scope, data[:location]]
-    in { kind: 'If', **data }; evaluate_if(data[:condition], data[:then], data[:otherwise], scope, data[:location])
-    in { kind: 'Function', **data }; evaluate_function(data[:parameters], data[:value], scope, data[:location])
-    in { kind: 'Call', **data }; evaluate_fn_call(data[:callee], data[:arguments], scope, data[:location])
-    in { kind: 'Tuple', **data }; evaluate_tuple(data[:first], data[:second], scope, data[:location])
-    in { kind: 'First', **data }; evaluate_tuple_access(data[:value], 0, scope, data[:location])
-    in { kind: 'Second', **data }; evaluate_tuple_access(data[:value], 1, scope, data[:location])
+    in { kind: 'Print',    **data }; evaluate_print(data, scope)
+    in { kind: 'Binary',   **data }; evaluate_binary(data, scope)
+    in { kind: 'Let',      **data }; evaluate_let(data, scope)
+    in { kind: 'If',       **data }; evaluate_if(data, scope)
+    in { kind: 'Function', **data }; evaluate_function(data, scope)
+    in { kind: 'Call',     **data }; evaluate_fn_call(data, scope)
+    in { kind: 'Tuple',    **data }; evaluate_tuple(data, scope)
+    in { kind: 'First',    **data }; evaluate_tuple_access(data, scope, 0)
+    in { kind: 'Second',   **data }; evaluate_tuple_access(data, scope, 1)
+
     else raise Error.new(location, "Unknown term: #{term}")
     end
   end
 
-  def evaluate_print(next_term, scope, location)
+  def evaluate_print(data, scope)
+    next_term, location = data.values_at(:value, :location)
+
     @executors.push(-> (result) { 
       begin 
         print "#{result}\n"
@@ -81,7 +84,10 @@ class Interpreter
     [:noop, nil, scope, location]
   end
 
-  def evaluate_let(text, value, next_term, scope, location)
+  def evaluate_let(data, scope)
+    text = data.dig(:name, :text)
+    value, next_term, location = data.values_at(:value, :next, :location)
+
     @executors.push(-> (result) { 
       scope[text] = result
       @terms.push(next_term)
@@ -92,7 +98,10 @@ class Interpreter
     [:noop, nil, scope, location]
   end
 
-  def evaluate_if(condition, then_term, otherwise_term, scope, location)
+  def evaluate_if(data, scope)
+    condition, then_term, otherwise_term, location = data
+      .values_at(:condition, :then, :otherwise, :location)
+
     @executors.push(-> (result) { 
       result ? @terms.push(then_term) : @terms.push(otherwise_term)
       [:noop, nil, scope, location]
@@ -102,7 +111,9 @@ class Interpreter
     [:noop, nil, scope, location]
   end
 
-  def evaluate_function(parameters, value, scope, location)
+  def evaluate_function(data, scope)
+    parameters, value, location = data.values_at(:parameters, :value, :location)
+
     func = -> (*args) { 
       new_scope = scope.dup
 
@@ -120,7 +131,9 @@ class Interpreter
     [:noop, nil, scope, location]
   end
 
-  def evaluate_tuple(first, second, scope, location)
+  def evaluate_tuple(data, scope)
+    first, second, location = data.values_at(:first, :second, :location)
+
     @executors.push(-> (first) {
       @executors.push(-> (second) {
         [:raw, [first, second], scope, location]
@@ -134,7 +147,9 @@ class Interpreter
     [:noop, nil, scope, location]
   end
 
-  def evaluate_tuple_access(value, index, scope, location)
+  def evaluate_tuple_access(data, scope, index)
+    value, location = data.values_at(:value, :location)
+
     @terms.push(value)
 
     @executors.push(-> (tuple) { 
@@ -147,7 +162,9 @@ class Interpreter
     [:noop, nil, scope, location]
   end
 
-  def evaluate_fn_call(callee, arguments, scope, location)
+  def evaluate_fn_call(data, scope)
+    callee, arguments, location = data.values_at(:callee, :arguments, :location)
+
     args = arguments.map do |arg|
       case arg
       in { kind: 'Binary', **data }
@@ -187,7 +204,9 @@ class Interpreter
     [:noop, nil, scope, location]
   end
 
-  def evaluate_binary(op, lhs, rhs, scope, location)
+  def evaluate_binary(data, scope)
+    op, lhs, rhs, location = data.values_at(:op, :lhs, :rhs, :location)
+
     @terms.push(rhs, lhs)
 
     @executors.push(-> (left) { 
