@@ -5,4 +5,4 @@ let fib = fn (n, a, b) => {
     fib(n - 1, b, a + b)
   }
 };
-print("fib = " + fib(100000, 0, 1))
+print("fib(100) = " + fib(95, 0, 1))

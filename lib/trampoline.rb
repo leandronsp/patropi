@@ -14,14 +14,10 @@ class Trampoline
 
       continuation, result, @scope, location = yield(term, @scope, location)
 
-      begin 
-        case [continuation, result]
-        in [:raw, result]; perform(result)
-        in [:noop, nil]; next
-        else raise Error.new(location, "Unknown continuation: #{continuation} with #{result}")
-        end
-      rescue => e
-        raise Error.new(location, "Unexpected error while evaluating continuation: #{e.message}")
+      case [continuation, result]
+      in [:raw, result]; perform(result)
+      in [:noop, nil]; next
+      else raise Error.new(location, "Unknown continuation: #{continuation} with #{result}")
       end
     end
   end
@@ -36,5 +32,7 @@ class Trampoline
       continuation, result, @scope, location = executor&.call(result)
       break if continuation == :noop
     end
+  rescue => e
+    raise Error.new(location, "Unexpected error while performing result: #{e.message}")
   end
 end

@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
-require 'test/unit'
-require 'json'
 require 'stringio'
-require_relative '../lib/lexer'
-require_relative '../lib/parser'
-require_relative '../lib/interpreter'
 
 def assert_printed_to_stdout(message)
   stdout = StringIO.new

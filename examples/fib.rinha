@@ -5,4 +5,4 @@ let fib = fn (n) => {
     fib(n - 1) + fib(n - 2)
   }
 };
-print("fib = " + fib(46))
+print("fib = " + fib(12))

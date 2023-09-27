@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-require 'test/unit'
-require_relative '../lib/lexer'
-require_relative '../lib/parser'
-
 class ParserTest < Test::Unit::TestCase
   def test_print_hello
     lexer = Lexer.new('print("Hello")')
