@@ -178,10 +178,12 @@ class Interpreter
         if result = @fn_cache[cache_key]
           [:raw, result, scope, location]
         else 
-          @executors.push(-> (result) { 
-            @fn_cache[cache_key] = result
-            [:raw, result, scope, location]
-          })
+          if callee[:text] 
+            @executors.push(-> (result) { 
+              @fn_cache[cache_key] = result
+              [:raw, result, scope, location]
+            })
+          end
 
           function.call(*args)
         end

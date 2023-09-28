@@ -1,0 +1,3 @@
+let sum = fn (a, b) => { print(a + b) };
+let _ = sum(10, 10);
+sum(10, 10)
