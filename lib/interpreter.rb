@@ -220,7 +220,7 @@ class Interpreter
     in ['Div', Integer, Integer]; lhs / rhs
     in ['Rem', Integer, Integer]; lhs % rhs
     in ['Sub', Integer, Integer]; lhs - rhs
-    in ['Eq', Integer, Integer]; lhs == rhs
+    in ['Eq', _, _]; lhs == rhs
     in ['Lt', Integer, Integer]; lhs < rhs
     in ['Lte', Integer, Integer]; lhs <= rhs
     in ['Gt', Integer, Integer]; lhs > rhs
