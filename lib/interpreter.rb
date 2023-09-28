@@ -1,4 +1,4 @@
-require 'json'
+require 'oj'
 
 require_relative 'error'
 require_relative 'ext'
@@ -16,7 +16,7 @@ class Interpreter
   end
 
   def run(json_input)
-    parsed = JSON.parse(json_input, symbolize_names: true)
+    parsed = Oj.load(json_input, symbolize_names: true)
 
     @terms.push(parsed[:expression])
 
