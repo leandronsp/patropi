@@ -2,7 +2,7 @@
 
 Yet another implementation for [rinha](https://github.com/aripiprazole/rinha-de-compiler/blob/main/SPECS.md).
 
-![tests](https://github.com/leandronsp/patropi/actions/workflows/ruby.yml/badge.svg)
+[![tests](https://github.com/leandronsp/patropi/actions/workflows/ruby.yml/badge.svg)](https://github.com/leandronsp/patropi/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/leandronsp/patropi/blob/main/LICENSE)
 
 ```
